@@ -1,5 +1,0 @@
-C:\dottoc\src\dotTOC\bin\Debug\dotTOC2.dll
-C:\dottoc\src\dotTOC\bin\Debug\dotTOC2.pdb
-C:\dottoc\src\dotTOC\obj\Debug\ResolveAssemblyReference.cache
-C:\dottoc\src\dotTOC\obj\Debug\dotTOC2.dll
-C:\dottoc\src\dotTOC\obj\Debug\dotTOC2.pdb
