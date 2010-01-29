@@ -10,7 +10,6 @@ using System.Timers;
 
 namespace dotTOC
 {
-
 	public enum NameFormat { Raw,Normalized }
 	public enum PasswordFormat { Raw,Roasted }
 
@@ -19,8 +18,6 @@ namespace dotTOC
 	/// </summary>
 	public class TOCUser
 	{
-
-
 		private string m_strName;
 		private string m_strPW;
 		
@@ -107,8 +104,8 @@ namespace dotTOC
             public short seqno;
             public short datalen;
         };
-        
-        // properties
+
+		// properties
 		public string m_strInfo = "dotTOC2 - .NET TOC2 Library";
 
 		public bool Connected
@@ -516,17 +513,18 @@ namespace dotTOC
 
 		public void Connect()
 		{
-			IPAddress ip;
-			ip = Dns.Resolve(m_strServer).AddressList[0];
+            //IPAddress ip = Dns.GetHostEntry(m_strServer);
+			//ip = Dns.Resolve(m_strServer).AddressList[0];
 			int port = m_iPort;
 			
-			IPEndPoint remote = new IPEndPoint(ip,port);
+			//IPEndPoint remote = new IPEndPoint(ip,port);
 
 			try 
 			{
 				m_socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 				m_socket.Blocking = false ;	
-				m_socket.BeginConnect(remote , new AsyncCallback(OnConnect), m_socket);
+				//m_socket.BeginConnect(remote , new AsyncCallback(OnConnect), m_socket);
+                m_socket.BeginConnect(m_strServer, m_iPort, new AsyncCallback(OnConnect), m_socket);
 			}
 			catch (Exception er)
 			{
