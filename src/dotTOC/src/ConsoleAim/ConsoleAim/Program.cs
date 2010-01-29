@@ -11,6 +11,12 @@ namespace ConsoleAim
         {
             try
             {
+                bool bQuitApp = false;
+
+                do
+                {
+
+                } while (!bQuitApp);
 
             }
             catch (Exception ex)
