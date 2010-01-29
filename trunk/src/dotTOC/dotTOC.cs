@@ -26,19 +26,35 @@ namespace dotTOC
             public short datalen;
         };
 
+        private string _strServer = "toc.oscar.aol.com";
+        public string Server
+        {
+            get { return _strServer; }
+        }
+
+        private int _iPort = 9898;
+        public int Port
+        {
+            get { return _iPort; }
+        }
+
         private Socket _socket;
         public Socket TOCSocket
         {
             get { return _socket; }
         }
 
-        private TOCUser user;
-        private string m_strServer = "toc.oscar.aol.com";
-        private int m_iPort = 9898;
+        private TOCUser _user;
+        public TOCUser User
+        {
+            get { return _user; }
+        }
 
-        
-        // properties
-		public string m_strInfo = "dotTOC2 - .NET TOC2 Library";
+        public string _strClientInfo = "dotTOC - .NET TOC Library";
+        public string ClientInfo
+        {
+            get { return _strClientInfo; }
+        }
 
 		public bool Connected
 		{
@@ -119,18 +135,18 @@ namespace dotTOC
 		#region contructors
 		public TOC()
 		{
-			user = new TOCUser();
+			_user = new TOCUser();
 		}
 
 		public TOC(string strName, string strPW)
 		{
-			user = new TOCUser(strName,strPW);
+            _user = new TOCUser(strName, strPW);
 		}
 
 		public TOC(string strServer, int iPort)
 		{
-			m_strServer = strServer;
-			iPort = m_iPort;
+			_strServer = strServer;
+			iPort = _iPort;
 		}
 		#endregion constructors
 
@@ -167,8 +183,8 @@ namespace dotTOC
 			const int TLV_VERSION = 1;
 			
 			byte [] packet = new byte[255];
-			
-			int msglen = 8 + user.GetName().Length;
+
+            int msglen = 8 + _user.GetName().Length;
 			int packetlen = 6 + msglen;
 
 			Array.Copy(GetFlapHeader(msglen,1),packet,6);
@@ -180,17 +196,17 @@ namespace dotTOC
 			packet[10] = 0;
 			packet[11] = (byte)BitConverter.ToChar(BitConverter.GetBytes(TLV_VERSION),0);
 
-			packet[12] = (byte)BitConverter.ToChar(BitConverter.GetBytes(user.GetName().Length),1);
-			packet[13] = (byte)BitConverter.ToChar(BitConverter.GetBytes(user.GetName().Length),0);
-			
-			Array.Copy(Encoding.ASCII.GetBytes(user.GetName()),0,packet,14,user.GetName().Length);
+            packet[12] = (byte)BitConverter.ToChar(BitConverter.GetBytes(_user.GetName().Length), 1);
+            packet[13] = (byte)BitConverter.ToChar(BitConverter.GetBytes(_user.GetName().Length), 0);
+
+            Array.Copy(Encoding.ASCII.GetBytes(User.GetName()), 0, packet, 14, User.GetName().Length);
 			_socket.Send(packet,packetlen,0);
 		}
 
 		private void SendUserSignOn()
 		{	
-			string strLogin = user.GetName();
-			string strPassword = user.GetPassword(PasswordFormat.Raw);
+			string strLogin = User.GetName();
+			string strPassword = User.GetPassword(PasswordFormat.Raw);
 
 			int code1 = (strLogin[0] - 96) * 7696 + 738816;
 			int code2 = ((strPassword[0] - 96) - 1) * code1 + (strLogin[0] - 96) * 746512 + 71665152;
@@ -199,8 +215,8 @@ namespace dotTOC
 			strMsg = string.Format("toc2_signon {0} {1} {2} {3} {4} {5} {6} {7}",
 				"login.oscar.aol.com",
 				5190,
-				user.GetName(),
-				user.GetPassword(),
+				User.GetName(),
+				User.GetPassword(),
 				"english",
 				"\"TIC:QuickBuddy\"",
 				160,
@@ -226,8 +242,8 @@ namespace dotTOC
 					break;
 
 				case "SIGN_ON":
-					Send("toc_add_buddy "+user.GetName());
-					Send("toc_set_info \""+m_strInfo+"\"");
+					Send("toc_add_buddy "+User.GetName());
+                    Send("toc_set_info \"" + ClientInfo + "\"");
 					Send("toc_init_done");
 					if (OnSignedOn != null)
 						OnSignedOn();
@@ -436,23 +452,17 @@ namespace dotTOC
 
 		public void Connect(string strName, string strPW)
 		{
-			user = new TOCUser(strName,strPW);
+			_user = new TOCUser(strName,strPW);
 			Connect();
 		}
 
 		public void Connect()
 		{
-			IPAddress ip;
-			ip = Dns.Resolve(m_strServer).AddressList[0];
-			int port = m_iPort;
-			
-			IPEndPoint remote = new IPEndPoint(ip,port);
-
-			try 
+    		try 
 			{
 				_socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 				_socket.Blocking = false ;	
-				_socket.BeginConnect(remote , new AsyncCallback(OnConnect), _socket);
+                _socket.BeginConnect(Server, Port, new AsyncCallback(OnConnect), _socket);
 			}
 			catch (Exception er)
 			{

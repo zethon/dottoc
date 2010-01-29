@@ -11,11 +11,20 @@ namespace ConsoleAim
         {
             try
             {
+                Controller app = new Controller();
 
+                if (app.Init())
+                {
+                    app.MainLoop();
+                }
+                else
+                {
+                    Console.WriteLine("Could not initialize application.");
+                }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Fatal Error: " + ex.Message);
+                Console.WriteLine("Program.Main Fatal Error: " + ex.Message);
             }
         }
     }
