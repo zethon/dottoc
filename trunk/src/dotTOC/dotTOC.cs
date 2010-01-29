@@ -19,8 +19,6 @@ namespace dotTOC
 	/// </summary>
 	public class TOCUser
 	{
-
-
 		private string m_strName;
 		private string m_strPW;
 		
