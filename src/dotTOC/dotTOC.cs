@@ -10,86 +10,6 @@ using System.Timers;
 
 namespace dotTOC
 {
-
-	public enum NameFormat { Raw,Normalized }
-	public enum PasswordFormat { Raw,Roasted }
-
-	/// <summary>
-	/// class for the screen name signed on using the TOC class
-	/// </summary>
-	public class TOCUser
-	{
-		private string m_strName;
-		private string m_strPW;
-		
-		public TOCUser()
-		{
-		}
-
-		public TOCUser(string strName, string strPW)
-		{
-			m_strName = strName;
-			m_strPW = strPW;
-		}
-
-		public string GetName()
-		{
-			return GetName(NameFormat.Normalized);
-		}
-
-		public string GetName(NameFormat nt)
-		{
-			if (nt == NameFormat.Normalized)
-				return Normalize(m_strName);
-
-			return m_strName;
-		}
-
-		public string GetPassword()
-		{
-			return GetPassword(PasswordFormat.Roasted);
-		}
-
-		public string GetPassword(PasswordFormat pt)
-		{
-			if (pt == PasswordFormat.Roasted)
-				return RoastedString(m_strPW);
-
-			return m_strPW;
-		}
-
-
-		/// <summary>
-		/// Returns a normalized version of the string, will concate the string to 16 chars
-		/// if necessary
-		/// </summary>
-		public static string Normalize(string strScreenName)
-		{
-			string strName= strScreenName;
-			strName = Regex.Replace(strName," ","");
-			strName = strName.ToLower();
-			
-			if (strName.Length > 16)
-                strName = strName.Remove(16,strName.Length-16);
-
-			return strName;
-		}
-
-		public static string RoastedString(string strOrig)
-		{
-			const string roaster = "Tic/TocTic/TocTic/TocTic/Toc";
-			string retStr = "0x";
-
-			for (int i=0 ; i < strOrig.Length; i++) 
-			{
-				retStr += string.Format("{0:x2}",strOrig[i] ^ roaster[i]);
-			}
-
-			return retStr;
-		}
-	}
-
-
 	/// <summary>
 	/// Summary description for Class1.
 	/// </summary>
@@ -105,6 +25,17 @@ namespace dotTOC
             public short seqno;
             public short datalen;
         };
+
+        private Socket _socket;
+        public Socket TOCSocket
+        {
+            get { return _socket; }
+        }
+
+        private TOCUser user;
+        private string m_strServer = "toc.oscar.aol.com";
+        private int m_iPort = 9898;
+
         
         // properties
 		public string m_strInfo = "dotTOC2 - .NET TOC2 Library";
@@ -112,8 +43,8 @@ namespace dotTOC
 		public bool Connected
 		{
 			get { 
-					if (m_socket != null ) 
-						return m_socket.Connected; 
+					if (_socket != null ) 
+						return _socket.Connected; 
 					else
 						return false;
 				}
@@ -173,10 +104,7 @@ namespace dotTOC
 		// privates
 		private bool m_bDCOnPurpose = false;
 		private bool m_bAutoReconnect = false;
-		private Socket m_socket;
-		private TOCUser user;
-		private string m_strServer = "toc.oscar.aol.com";
-		private int m_iPort = 9898;
+
 		private Byte[] m_byBuff = new Byte[32767];
 		private int m_iSeqNum;
 
@@ -256,7 +184,7 @@ namespace dotTOC
 			packet[13] = (byte)BitConverter.ToChar(BitConverter.GetBytes(user.GetName().Length),0);
 			
 			Array.Copy(Encoding.ASCII.GetBytes(user.GetName()),0,packet,14,user.GetName().Length);
-			m_socket.Send(packet,packetlen,0);
+			_socket.Send(packet,packetlen,0);
 		}
 
 		private void SendUserSignOn()
@@ -401,7 +329,7 @@ namespace dotTOC
 		private void SendFlapInit()
 		{
 			byte[] query = Encoding.Default.GetBytes("FLAPON\r\n\r\n");
-			m_socket.Send(query);
+			_socket.Send(query);
 		}
 
 		private void SetupRecieveCallback (Socket sock)
@@ -488,8 +416,8 @@ namespace dotTOC
 			Array.Copy(GetFlapHeader(msgLen),packet,6);
 			Array.Copy(Encoding.Default.GetBytes(szMsg),0,packet,6,msgLen);
 
-			if (m_socket != null && m_socket.Connected)
-				m_socket.Send(packet,msgLen+6,0);
+			if (_socket != null && _socket.Connected)
+				_socket.Send(packet,msgLen+6,0);
 		}
 
 		public void SendMessage(string strUser, string strMsg)
@@ -522,9 +450,9 @@ namespace dotTOC
 
 			try 
 			{
-				m_socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-				m_socket.Blocking = false ;	
-				m_socket.BeginConnect(remote , new AsyncCallback(OnConnect), m_socket);
+				_socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+				_socket.Blocking = false ;	
+				_socket.BeginConnect(remote , new AsyncCallback(OnConnect), _socket);
 			}
 			catch (Exception er)
 			{
@@ -671,10 +599,10 @@ namespace dotTOC
 		{
 			m_bDCOnPurpose = true;
 			
-			if (m_socket != null && m_socket.Connected)
+			if (_socket != null && _socket.Connected)
 			{
-				m_socket.Shutdown(SocketShutdown.Both);
-				m_socket.Close();
+				_socket.Shutdown(SocketShutdown.Both);
+				_socket.Close();
 				if (OnDisconnect != null)
 					OnDisconnect();	
 			}

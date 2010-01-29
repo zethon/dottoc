@@ -92,6 +92,7 @@
     <Compile Include="dotTOC.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="TOCUser.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
