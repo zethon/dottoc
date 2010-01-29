@@ -9,6 +9,14 @@ namespace ConsoleAim
     {
         static void Main(string[] args)
         {
+            try
+            {
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Fatal Error: " + ex.Message);
+            }
         }
     }
 }
