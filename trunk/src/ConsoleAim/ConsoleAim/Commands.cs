@@ -52,8 +52,15 @@ namespace ConsoleAim
             }
         }
 
+        Controller _controller = null;
+
+        public Commands(Controller controller)
+        {
+            _controller = controller;
+        }
+
         [CommandMethod("help", "this is it")]
-        [MethodAlias(new string[] {"?","ayudar"})]
+        [MethodAlias(new string[] {"?","ayudar","/?"})]
         public void Help()
         {
             Type t = this.GetType();
@@ -73,6 +80,26 @@ namespace ConsoleAim
                 }
 
             }
+        }
+
+        [CommandMethod("login", "login <username> <password>")]
+        [MethodAlias(new string[] { "li", "/l" })]
+        public void Login(CommandParser parser)
+        {
+            if (parser.Parameters.Length < 2)
+            {
+                Console.WriteLine("Usage: login <username> <password>");
+                return;
+            }
+
+            _controller.Login(parser.Parameters[0], parser.Parameters[1]);
+        }
+
+        [CommandMethod("exit", "exit the program")]
+        [MethodAlias(new string[] { "q", "quit", "/q" })]
+        public void Exit()
+        {
+            _controller.Quit();
         }
 
         public void ExecuteCommand(string strCommand)
