@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using dotTOC;
 
 namespace ConsoleAim
 {
@@ -15,11 +16,18 @@ namespace ConsoleAim
         }
 
         private Commands _commands;
+        private dotTOC.TOC _toc;
 
         public bool Init()
         {
-            _commands = new Commands();
+            _toc = new TOC();
+            _commands = new Commands(this);
             return true;
+        }
+
+        public void Login(string strUsername, string strPassword)
+        {
+            _toc.Connect(strUsername, strPassword);
         }
 
         public void MainLoop()
@@ -39,7 +47,23 @@ namespace ConsoleAim
                 _commands.ExecuteCommand(strInput);
 
             } while (!AppQuit);
+        }
 
+        public void Quit()
+        {
+            Quit(false);
+        }
+
+        public void Quit(bool bForce)
+        {
+            if (bForce)
+            {
+                Environment.Exit(0);
+            }
+            else
+            {
+                AppQuit = true;
+            }
         }
     }
 }
