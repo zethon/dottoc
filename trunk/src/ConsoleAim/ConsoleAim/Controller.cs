@@ -17,13 +17,20 @@ namespace ConsoleAim
 
         private Commands _commands;
         private dotTOC.TOC _toc;
+        private string _strPrompt = string.Empty;
+        private string _strLastUser = string.Empty;
 
         public bool Init()
         {
             _toc = new TOC();
+            _toc.OnSignedOn += new TOC.OnSignedOnHandler(OnSignedOn);
+            _toc.OnIMIn += new TOC.OnIMInHandler(OnIMIn);
+
             _commands = new Commands(this);
             return true;
         }
+
+
 
         public void Login(string strUsername, string strPassword)
         {
@@ -34,19 +41,26 @@ namespace ConsoleAim
         {
             string strInput = string.Empty;
 
-            do
+            try
             {
-                Console.Write(@">");
-                strInput = System.Console.ReadLine();
-
-                if (strInput.Length == 0)
+                do
                 {
-                    continue;
-                }
+                    Console.Write(_strPrompt + @">");
+                    strInput = System.Console.ReadLine();
 
-                _commands.ExecuteCommand(strInput);
+                    if (strInput.Length == 0)
+                    {
+                        continue;
+                    }
 
-            } while (!AppQuit);
+                    _commands.ExecuteCommand(strInput);
+
+                } while (!AppQuit);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Controller.MainLoop Exception: " + ex.Message);
+            }
         }
 
         public void Quit()
@@ -62,8 +76,34 @@ namespace ConsoleAim
             }
             else
             {
+                _toc.Disconnect();
                 AppQuit = true;
             }
+        }
+
+        public void Reply(string strMessage)
+        {
+            if (_strLastUser != string.Empty)
+            {
+                _toc.SendMessage(_strLastUser, strMessage);
+            }
+        }
+
+        void OnIMIn(string strUser, string strMsg, bool bAuto)
+        {
+            _strLastUser = strUser;
+
+            Console.WriteLine(string.Format("{0}{1}: {2}",
+                strUser,
+                bAuto ? " [AUTO]" : string.Empty,
+                strMsg));
+        }
+
+        void OnSignedOn()
+        {
+            _strPrompt += "*";
+            Console.WriteLine();
+            Console.WriteLine("Connected...");
         }
     }
 }

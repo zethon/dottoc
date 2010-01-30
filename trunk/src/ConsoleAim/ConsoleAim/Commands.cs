@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace ConsoleAim
 {
@@ -95,6 +97,39 @@ namespace ConsoleAim
             _controller.Login(parser.Parameters[0], parser.Parameters[1]);
         }
 
+        [CommandMethod("reply", "reply <message>, replies to sender of most recent message")]
+        [MethodAlias(new string[] { "r", "/r" })]
+        public void Reply(string strText)
+        {
+            _controller.Reply(strText);
+        }
+
+        [CommandMethod("send", "send <username> <message>, send message to user")]
+        [MethodAlias(new string[] { "s", "/s" })]
+        public void Send(string strText)
+        {
+            try
+            {
+                int iSpace = strText.IndexOf(' ');
+
+                if (iSpace != -1)
+                {
+
+                }
+                string[] strTemp = Regex.Split(strText, @"\s");
+                //if (parser.Parameters.Length > 1)
+                //{
+                //    ArrayList temp = new ArrayList(parser.Parameters.ToArray());
+                //    temp.RemoveAt(0);
+                //    string strMessage = string.Join(" ", (string[])temp.ToArray());
+                //}
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Commands.Send Exception: " + ex.Message);
+            }
+        }
+
         [CommandMethod("exit", "exit the program")]
         [MethodAlias(new string[] { "q", "quit", "/q" })]
         public void Exit()
@@ -149,7 +184,10 @@ namespace ConsoleAim
                         foreach (ParameterInfo m in mi.GetParameters())
                         {
                             if (m.ParameterType == typeof(string))
-                                oparams[oparams.Length - 1] = parser.Parameters[oparams.Length - 1];
+                            {
+                                //oparams[oparams.Length - 1] = parser.Parameters[oparams.Length - 1];
+                                oparams[oparams.Length - 1] = parser.WorkingString;
+                            }
                             else if (m.ParameterType == typeof(CommandParser))
                                 oparams[oparams.Length - 1] = parser;
                         }
@@ -161,7 +199,7 @@ namespace ConsoleAim
                 }
                 catch (Exception e)
                 {
-                    //log.Debug("Execute Command Exception", e);
+                    Console.WriteLine("Commands.ExecuteCommand exception: " + e.Message);
                 }
             }
             else
