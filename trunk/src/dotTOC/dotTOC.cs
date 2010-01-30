@@ -58,12 +58,17 @@ namespace dotTOC
 
 		public bool Connected
 		{
-			get { 
-					if (_socket != null ) 
-						return _socket.Connected; 
-					else
-						return false;
-				}
+            get
+            {
+                if (_socket != null)
+                {
+                    return _socket.Connected;
+                }
+                else
+                {
+                    return false;
+                }
+            }
 		}
 
 		public bool AutoReconnect
@@ -525,8 +530,10 @@ namespace dotTOC
 						
 							case FT_DATA:
 								string sRecieved = Encoding.ASCII.GetString(m_byBuff,nBytesRead+6,fh.datalen);
-								if (OnIncoming != null)
-									OnIncoming(sRecieved);
+                                if (OnIncoming != null)
+                                {
+                                    OnIncoming(sRecieved);
+                                }
 								Dispatch(sRecieved);
 								break;
 
