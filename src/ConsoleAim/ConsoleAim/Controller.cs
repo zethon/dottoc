@@ -83,7 +83,7 @@ namespace ConsoleAim
 
         public void Reply(string strMessage)
         {
-            if (_strLastUser != string.Empty)
+            if (_strLastUser != string.Empty && _toc.Connected)
             {
                 _toc.SendMessage(_strLastUser, strMessage);
             }
