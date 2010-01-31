@@ -75,17 +75,10 @@ namespace dotTOC
 		{
 			get { return m_bAutoReconnect; }
 			set { m_bAutoReconnect = value; }
-		}
+        }
 
-		private bool m_bAutoAddBuddies = false;
-		public bool AutoAddBuddies
-		{
-			get { return m_bAutoAddBuddies; }
-			set { m_bAutoAddBuddies = value; }
-		}
-
-		// delegates/callbacks
-		public delegate void OnErrorHandler(string strError);
+        #region delegates/callbacks
+        public delegate void OnErrorHandler(string strError);
 		public event OnErrorHandler OnError;
 
 		public delegate void OnDisconnectHandler();
@@ -114,8 +107,9 @@ namespace dotTOC
 
 		public delegate void OnChatJoinedHandler(string strRoomID, string strRoomName);
 		public event OnChatJoinedHandler OnChatJoined;
+        #endregion
 
-		// data types received from server
+        // data types received from server
 		private const byte FT_SIGNON	= 1;
 		private const byte FT_DATA		= 2;
 		private const byte FT_ERROR		= 3;	// not used by TOC
