@@ -44,8 +44,8 @@ namespace dotTOC
             get { return _socket; }
         }
 
-        private TOCUser _user;
-        public TOCUser User
+        private User _user;
+        public User User
         {
             get { return _user; }
         }
@@ -132,12 +132,12 @@ namespace dotTOC
 		#region contructors
 		public TOC()
 		{
-			_user = new TOCUser();
+			_user = new User();
 		}
 
 		public TOC(string strName, string strPW)
 		{
-            _user = new TOCUser(strName, strPW);
+            _user = new User(strName, strPW);
 		}
 
 		public TOC(string strServer, int iPort)
@@ -166,7 +166,7 @@ namespace dotTOC
 					i = strTemp.IndexOf(":",0);
 					strTemp = strTemp.Remove(i,strTemp.Length-(i-1));
 
-					names.Add(TOCUser.Normalize(strTemp));
+					names.Add(User.Normalize(strTemp));
 				}
 				
 			}
@@ -253,14 +253,14 @@ namespace dotTOC
 					{
 						string strMsg = string.Join("",strArray,8,strArray.Length-8);
 						//string strMsg = strArray[8];
-						OnIMIn(TOCUser.Normalize(strArray[2]),Regex.Replace(strMsg,@"<(.|\n)*?>",string.Empty),strArray[4] == "T");
+						OnIMIn(User.Normalize(strArray[2]),Regex.Replace(strMsg,@"<(.|\n)*?>",string.Empty),strArray[4] == "T");
 					}
 					break;
 
 				case "UPDATE_BUDDY2":
 					if (OnUpdateBuddy != null)
 					{
-						OnUpdateBuddy(TOCUser.Normalize(strArray[2]),strArray[4] == "T");
+						OnUpdateBuddy(User.Normalize(strArray[2]),strArray[4] == "T");
 					}
 					break;
 
@@ -270,7 +270,7 @@ namespace dotTOC
 						int iLvl = int.Parse(strArray[2]);
 
 						if (strArray.Length == 5)
-							OnEviled(iLvl,false,TOCUser.Normalize(strArray[4]));
+							OnEviled(iLvl,false,User.Normalize(strArray[4]));
 						else if (strArray.Length == 4)
 							OnEviled(iLvl,true,"");
 					}
@@ -421,14 +421,14 @@ namespace dotTOC
 		{
 			string strText;
 			strText = string.Format("toc2_send_im {0} \"{1}\"{2}",
-				TOCUser.Normalize(strUser),Encode(strMsg),
+				User.Normalize(strUser),Encode(strMsg),
 				bAuto ? " auto" : "");
 			Send(strText);
 		}
 
 		public void Connect(string strName, string strPW)
 		{
-			_user = new TOCUser(strName,strPW);
+			_user = new User(strName,strPW);
 			Connect();
 		}
 
