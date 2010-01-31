@@ -129,6 +129,7 @@ namespace dotTOC
 		private Byte[] m_byBuff = new Byte[32767];
 		private int m_iSeqNum;
 
+        // TODO: remove these
 		private bool m_bGetLineFailure = false;
 		private bool m_bGetLineWait = false;
 		private string m_GetLineString = "";
@@ -405,26 +406,26 @@ namespace dotTOC
 
 		#region public_functions
 
-		// TODO: this can be arranged more eloquently
-		public bool GetLine(ref string strLine)
-		{
-			m_bGetLineWait = true;
-			m_Timer.Start();
+        // TODO: this can be arranged more eloquently
+        public bool GetLine(ref string strLine)
+        {
+            m_bGetLineWait = true;
+            m_Timer.Start();
 
-			// TODO: add timeout functionality
-			while (m_bGetLineWait);
-			m_Timer.Stop();
+            // TODO: add timeout functionality
+            while (m_bGetLineWait) ;
+            m_Timer.Stop();
 
-			if (m_bGetLineFailure)
-			{
-				strLine = "";
-				m_bGetLineFailure = false;
-				return false;
-			}
+            if (m_bGetLineFailure)
+            {
+                strLine = "";
+                m_bGetLineFailure = false;
+                return false;
+            }
 
-			strLine = m_GetLineString;
-			return true;
-		}
+            strLine = m_GetLineString;
+            return true;
+        }
 
 		public void Send(string szMsg)
 		{
@@ -594,22 +595,6 @@ namespace dotTOC
 
 			strCommand = "toc2_new_buddies {"+strCommand+"}";
 			Send(strCommand);
-
-//			string strCommand = "toc_add_buddy ";
-//			foreach (string strName in strBuddies)
-//			{
-//				string strTemp = strCommand + strName+" ";
-//				
-//				if (strTemp.Length >= 2048)
-//				{
-//					Send(strCommand);
-//					Thread.Sleep(150);
-//					strCommand = "toc_add_buddy ";
-//				}
-//				else
-//					strCommand += strName+" ";
-//			}
-//			Send(strCommand);
 		}
 
 		public void Disconnect()
