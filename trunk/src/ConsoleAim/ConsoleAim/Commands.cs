@@ -61,8 +61,15 @@ namespace ConsoleAim
             _controller = controller;
         }
 
-        [CommandMethod("help", "this is it")]
-        [MethodAlias(new string[] {"?","ayudar","/?"})]
+        [CommandMethod("/exit", "exit the program")]
+        [MethodAlias(new string[] { "/q", "/e", "/exit" })]
+        public void Exit()
+        {
+            _controller.Quit();
+        }
+
+        [CommandMethod("/help", "this is it")]
+        [MethodAlias(new string[] {"/?","/help"})]
         public void Help()
         {
             Type t = this.GetType();
@@ -84,8 +91,8 @@ namespace ConsoleAim
             }
         }
 
-        [CommandMethod("login", "login <username> <password>")]
-        [MethodAlias(new string[] { "li", "/l" })]
+        [CommandMethod("/login", "/login <username> <password>")]
+        [MethodAlias(new string[] {"/l","/login"})]
         public void Login(CommandParser parser)
         {
             if (parser.Parameters.Length < 2)
@@ -97,32 +104,29 @@ namespace ConsoleAim
             _controller.Login(parser.Parameters[0], parser.Parameters[1]);
         }
 
-        [CommandMethod("reply", "reply <message>, replies to sender of most recent message")]
-        [MethodAlias(new string[] { "r", "/r" })]
+        [CommandMethod("/reply", "/reply <message>, replies to sender of most recent message")]
+        [MethodAlias(new string[] {"/r","/reply"})]
         public void Reply(string strText)
         {
             _controller.Reply(strText);
         }
 
-        [CommandMethod("send", "send <username> <message>, send message to user")]
-        [MethodAlias(new string[] { "s", "/s" })]
+        [CommandMethod("/send", "/send <username> <message>, send message to user")]
+        [MethodAlias(new string[] {"/s","/send"})]
         public void Send(string strText)
         {
             try
             {
+                string strName = string.Empty;
                 int iSpace = strText.IndexOf(' ');
 
                 if (iSpace != -1)
                 {
+                    strName = strText.Substring(0, iSpace);
+                    strText = strText.Substring(iSpace + 1, strText.Length - (iSpace + 1));
 
+                    _controller.Send(strName, strText);
                 }
-                string[] strTemp = Regex.Split(strText, @"\s");
-                //if (parser.Parameters.Length > 1)
-                //{
-                //    ArrayList temp = new ArrayList(parser.Parameters.ToArray());
-                //    temp.RemoveAt(0);
-                //    string strMessage = string.Join(" ", (string[])temp.ToArray());
-                //}
             }
             catch (Exception ex)
             {
@@ -130,11 +134,27 @@ namespace ConsoleAim
             }
         }
 
-        [CommandMethod("exit", "exit the program")]
-        [MethodAlias(new string[] { "q", "quit", "/q" })]
-        public void Exit()
+        [CommandMethod("/current", "/current <username>, sets the user of the current conversation")]
+        [MethodAlias(new string[] { "/c", "/current" })]
+        public void SetDefault(CommandParser parser)
         {
-            _controller.Quit();
+            if (parser.Parameters.Length > 0)
+            {
+                string strTemp = parser.Parameters[0];
+                if (strTemp.Length < 3)
+                {
+                    _controller.WriteError("Invalid username.");
+                }
+                else
+                {
+                    _controller.CurrentUser = parser.Parameters[0];
+                }
+            }
+            else
+            {
+                _controller.WriteError("You did not specify a username.");
+            }
+
         }
 
         public void ExecuteCommand(string strCommand)

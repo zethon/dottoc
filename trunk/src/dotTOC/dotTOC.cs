@@ -128,16 +128,7 @@ namespace dotTOC
 
 		private Byte[] m_byBuff = new Byte[32767];
 		private int m_iSeqNum;
-
-        // TODO: remove these
-		private bool m_bGetLineFailure = false;
-		private bool m_bGetLineWait = false;
-		private string m_GetLineString = "";
-		
-
-		private System.Timers.Timer m_Timer;
-
-
+	
 		#region contructors
 		public TOC()
 		{
@@ -233,8 +224,10 @@ namespace dotTOC
 
 		private void Dispatch(string strIncoming)
 		{
-			if (OnServerMessage != null)
-				OnServerMessage(strIncoming);
+            if (OnServerMessage != null)
+            {
+                OnServerMessage(strIncoming);
+            }
 
 			Regex r = new Regex("(:)"); // Split on colon
 			string[] strArray = r.Split(strIncoming);
@@ -261,13 +254,6 @@ namespace dotTOC
 						string strMsg = string.Join("",strArray,8,strArray.Length-8);
 						//string strMsg = strArray[8];
 						OnIMIn(TOCUser.Normalize(strArray[2]),Regex.Replace(strMsg,@"<(.|\n)*?>",string.Empty),strArray[4] == "T");
-
-						if (m_bGetLineWait)
-						{
-							m_GetLineString = Regex.Replace(strMsg,@"<(.|\n)*?>",string.Empty);
-							m_bGetLineWait = false;
-							m_Timer.Stop();
-						}
 					}
 					break;
 
@@ -308,9 +294,14 @@ namespace dotTOC
 				break;
 
 				case "CHAT_JOIN":
-					if (OnChatJoined != null)
-						OnChatJoined(strArray[2],strArray[4]);
+                    if (OnChatJoined != null)
+                    {
+                        OnChatJoined(strArray[2], strArray[4]);
+                    }
 				break;
+
+                case "CLIENT_EVENT2":
+                break;
 					
 				default:
 					break;
@@ -406,27 +397,6 @@ namespace dotTOC
 
 		#region public_functions
 
-        // TODO: this can be arranged more eloquently
-        public bool GetLine(ref string strLine)
-        {
-            m_bGetLineWait = true;
-            m_Timer.Start();
-
-            // TODO: add timeout functionality
-            while (m_bGetLineWait) ;
-            m_Timer.Stop();
-
-            if (m_bGetLineFailure)
-            {
-                strLine = "";
-                m_bGetLineFailure = false;
-                return false;
-            }
-
-            strLine = m_GetLineString;
-            return true;
-        }
-
 		public void Send(string szMsg)
 		{
 			const int TOC_BUFFER = 4096;
@@ -485,9 +455,6 @@ namespace dotTOC
 			{
 				if (sock.Connected)
 				{
-					m_Timer = new System.Timers.Timer(1000*10);
-					m_Timer.Elapsed +=new ElapsedEventHandler(TimerElapsed);
-
 					m_bDCOnPurpose = false;
 					SendFlapInit();
 					SetupRecieveCallback(sock);
@@ -613,15 +580,5 @@ namespace dotTOC
         public enum IsAvailableReponse { FALSE, TRUE, TIMEOUT, UNKNOWN }
 
 		#endregion public_functions
-
-		private void TimerElapsed(object sender, ElapsedEventArgs e)
-		{
-			if (m_bGetLineWait)
-			{
-				m_bGetLineWait = false;
-				m_bGetLineFailure = true;
-				m_GetLineString = "";
-			}
-		}
 	}
 }
