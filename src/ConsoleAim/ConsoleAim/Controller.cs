@@ -18,8 +18,9 @@ namespace ConsoleAim
         private Commands _commands;
         private dotTOC.TOC _toc;
         private string _strPrompt = string.Empty;
-
         private string _strLastUser = string.Empty;
+        //private List<Buddy> _buddyList = new List<Buddy>();
+        private Dictionary<string, Buddy> _buddyList = new Dictionary<string, Buddy>();
 
         private string _strCurrentUser = string.Empty;
         public string CurrentUser
@@ -34,20 +35,50 @@ namespace ConsoleAim
             _toc.OnSignedOn += new TOC.OnSignedOnHandler(OnSignedOn);
             _toc.OnIMIn += new TOC.OnIMInHandler(OnIMIn);
             _toc.OnUpdateBuddy += new TOC.OnUpdateBubbyHandler(OnUpdateBuddy);
+            _toc.OnSendIM += new TOC.OnSendIMHander(OnSendIM);
 
             _commands = new Commands(this);
             return true;
         }
 
+
+
         void OnUpdateBuddy(string strUser, bool bOnline)
         {
-            string strStat = @"signed on";
-            if (!bOnline)
+            bool bDoOutput = false;
+            Buddy b = new Buddy(strUser,bOnline ? BuddyStatus.Online : BuddyStatus.Offline);
+            
+            string strStat = @" signed on";
+
+            if (_buddyList.ContainsKey(strUser))
             {
-                strStat = @"signed off";
+                bDoOutput = true;
+                if (!bOnline)
+                {
+                    strStat = @" signed off";
+                }
+            }
+            else if (bOnline)
+            {
+                bDoOutput = true;
             }
 
-            Console.WriteLine(string.Format("{0} {1}", strUser, strStat), ConsoleColor.Green);            
+            _buddyList[strUser] = b;
+
+            if (bDoOutput)
+            {
+                ConsoleColor c = Console.ForegroundColor;
+
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.Write("[{0}] ", DateTime.Now.ToString("HH:mm:ss"));
+
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.Write(strUser);
+
+                Console.ForegroundColor = c;
+                Console.WriteLine(strStat);
+            }
+
         }
 
 
@@ -66,7 +97,7 @@ namespace ConsoleAim
             {
                 do
                 {
-                    Console.Write(_strPrompt + @">");
+                    //Console.Write(_strPrompt + @">");
                     strInput = Console.ReadLine();
 
                     if (strInput.Length == 0)
@@ -182,6 +213,35 @@ namespace ConsoleAim
                 Console.WriteLine(strMessage);
 
             }
+        }
+
+        void OnSendIM(string strUser, string strMsg, bool bAuto)
+        {
+            _strLastUser = strUser;
+            ConsoleColor c = Console.ForegroundColor;
+
+            Console.ForegroundColor = ConsoleColor.DarkYellow;
+            Console.Write("[{0}] ", DateTime.Now.ToString("HH:mm:ss"));
+
+            Console.ForegroundColor = ConsoleColor.DarkCyan;
+            Console.Write("<");
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.Write(_toc.User.UserName);
+            Console.ForegroundColor = ConsoleColor.DarkCyan;
+            Console.Write("> ");
+
+            if (bAuto)
+            {
+                Console.ForegroundColor = ConsoleColor.DarkGreen;
+                Console.Write("[");
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.Write("AUTO");
+                Console.ForegroundColor = ConsoleColor.DarkGreen;
+                Console.Write("> ");
+            }
+
+            Console.ForegroundColor = c;
+            Console.WriteLine(strMsg);
         }
 
         void OnSignedOn()
