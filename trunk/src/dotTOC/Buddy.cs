@@ -7,23 +7,36 @@ namespace dotTOC
 {
     public enum BuddyStatus
     {
+        Unknown,
         Offline,
         Online,
         Idle
     }
 
-    class Buddy
+    public class Buddy
     {
-        private string _strName = string.Empty;
         public string Name
         {
-            get { return _strName; }
+            set;
+            get;
         }
 
-        private BuddyStatus _status = BuddyStatus.Offline;
         public BuddyStatus Status
         {
-            get { return _status; }
+            set;
+            get;
+        }
+
+        public Buddy(string strName)
+        {
+            Name = strName;
+            Status = BuddyStatus.Unknown;
+        }
+        
+        public Buddy(string strName, BuddyStatus buddyStatus)
+        {
+            Name = strName;
+            Status = buddyStatus;
         }
     }
 }
