@@ -96,9 +96,6 @@ namespace dotTOC
 		public delegate void OnEviledHandler(int iLvl, bool bAnonymous, string strSender);
 		public event OnEviledHandler OnEviled;
 
-		public delegate void OnIncomingHandler(string strMessage);
-		public event OnIncomingHandler OnIncoming;
-
 		public delegate void OnServerMessageHandler(string strIncoming);
 		public event OnServerMessageHandler OnServerMessage;
 
@@ -115,8 +112,6 @@ namespace dotTOC
 
 		// privates
 		private bool _bDCOnPurpose = false;
-		private bool m_bAutoReconnect = false;
-
 		private Byte[] m_byBuff = new Byte[32767];
 		private int _iSeqNum;
 	
@@ -276,6 +271,7 @@ namespace dotTOC
 		    sock.BeginReceive(m_byBuff, 0, m_byBuff.Length, SocketFlags.None,recieveData, sock);
 		}
 
+
 		public static string Encode(string strMessage)
 		{
 			string strRetStr = "";
@@ -320,7 +316,6 @@ namespace dotTOC
 
             Regex r = new Regex("(:)"); // Split on colon
             string[] strArray = r.Split(strIncoming);
-            //string[] strArray = strIncoming.Split(':');
 
             switch (strArray[0])
             {
@@ -328,7 +323,7 @@ namespace dotTOC
                 case "CONFIG2":
                     //if (AutoAddBuddies)
                     //	AddBuddies(GetConfigBuddies(strIncoming));
-                    break;
+                break;
 
                 case "SIGN_ON":
                     Send("toc_add_buddy " + User.GetName());
@@ -396,6 +391,10 @@ namespace dotTOC
 
 		#region public_functions
 
+        /// <summary>
+        /// Send a TOC command to the server
+        /// </summary>
+        /// <param name="szMsg">TOC command to be sent</param>
 		public void Send(string szMsg)
 		{
 			const int TOC_BUFFER = 4096;
@@ -418,6 +417,12 @@ namespace dotTOC
 			SendMessage(strUser,strMsg,false);
 		}
 
+        /// <summary>
+        /// Send an IM
+        /// </summary>
+        /// <param name="strUser">The destination username of the IM</param>
+        /// <param name="strMsg">The message to be sent to the user</param>
+        /// <param name="bAuto">A flag indicating if this is an automatic message sent by the client</param>
 		public void SendMessage(string strUser,string strMsg, bool bAuto)
 		{
 			string strText;
@@ -471,7 +476,7 @@ namespace dotTOC
                     //DispatchError("Connection failed.");
                 }
 			}
-			catch( Exception ex )
+			catch (Exception ex)
 			{
                 // TODO: rethink the try/catch handling
                 //       * should it be handled in this module
@@ -510,12 +515,8 @@ namespace dotTOC
 						
 							case FT_DATA:
 								string sRecieved = Encoding.ASCII.GetString(m_byBuff,nBytesRead+6,fh.datalen);
-                                if (OnIncoming != null)
-                                {
-                                    OnIncoming(sRecieved);
-                                }
 								Dispatch(sRecieved);
-								break;
+							break;
 
 							default:
 								break;
