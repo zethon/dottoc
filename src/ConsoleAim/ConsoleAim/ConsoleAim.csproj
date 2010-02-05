@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.30729</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{0AEFC058-E702-426C-A855-D964CA211AF9}</ProjectGuid>
     <OutputType>Exe</OutputType>
@@ -52,7 +52,6 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CommandParser.cs" />
-    <Compile Include="BuddyComparer.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\dotTOC\dotTOC.csproj">
