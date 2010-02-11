@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using dotTOC;
 
 namespace ConsoleAim
 {
@@ -152,9 +153,36 @@ namespace ConsoleAim
             }
             else
             {
-                _controller.WriteError("You did not specify a username.");
+                if (_controller.CurrentUser == string.Empty)
+                {
+                    _controller.WriteError("You did not specify a username.");
+                }
+                else
+                {
+                    Console.WriteLine(string.Format("Default user: {0}", _controller.CurrentUser));
+                }
             }
 
+        }
+
+        [CommandMethod("/buddy", "show online buddie")]
+        [MethodAlias(new string[] { "/b", "/buddy" })]
+        public void ShowBuddyList()
+        {
+            lock (this)
+            {
+                ConsoleColor c = Console.ForegroundColor;
+                Console.ForegroundColor = ConsoleColor.Cyan;
+
+                foreach (Buddy buddy in _controller.BuddyList.Values)
+                {
+                    if (buddy.Status == BuddyStatus.Online)
+                    {
+                        Console.WriteLine(string.Format("{0} is online", buddy.Name));
+                    }
+                }
+                Console.ForegroundColor = c;
+            }
         }
 
         public void ExecuteCommand(string strCommand)
