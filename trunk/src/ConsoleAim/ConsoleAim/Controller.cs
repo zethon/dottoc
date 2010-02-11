@@ -19,8 +19,13 @@ namespace ConsoleAim
         private dotTOC.TOC _toc;
         private string _strPrompt = string.Empty;
         private string _strLastUser = string.Empty;
-        //private List<Buddy> _buddyList = new List<Buddy>();
+
         private Dictionary<string, Buddy> _buddyList = new Dictionary<string, Buddy>();
+        public Dictionary<string, Buddy> BuddyList
+        {
+            get { return _buddyList; }
+        }
+
 
         private string _strCurrentUser = string.Empty;
         public string CurrentUser
@@ -206,7 +211,7 @@ namespace ConsoleAim
                     Console.ForegroundColor = ConsoleColor.Green;
                     Console.Write("AUTO");
                     Console.ForegroundColor = ConsoleColor.DarkGreen;
-                    Console.Write("> ");
+                    Console.Write("] ");
                 }
 
                 Console.ForegroundColor = c;
