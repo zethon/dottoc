@@ -222,34 +222,31 @@ namespace ConsoleAim
 
         void OnSendIM(string strUser, string strMsg, bool bAuto)
         {
-            lock (this)
+            _strLastUser = strUser;
+            ConsoleColor c = Console.ForegroundColor;
+
+            Console.ForegroundColor = ConsoleColor.DarkYellow;
+            Console.Write("[{0}] ", DateTime.Now.ToString("HH:mm:ss"));
+
+            Console.ForegroundColor = ConsoleColor.DarkCyan;
+            Console.Write("<");
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.Write(_toc.User.UserName);
+            Console.ForegroundColor = ConsoleColor.DarkCyan;
+            Console.Write("> ");
+
+            if (bAuto)
             {
-                _strLastUser = strUser;
-                ConsoleColor c = Console.ForegroundColor;
-
-                Console.ForegroundColor = ConsoleColor.DarkYellow;
-                Console.Write("[{0}] ", DateTime.Now.ToString("HH:mm:ss"));
-
-                Console.ForegroundColor = ConsoleColor.DarkCyan;
-                Console.Write("<");
-                Console.ForegroundColor = ConsoleColor.Cyan;
-                Console.Write(_toc.User.UserName);
-                Console.ForegroundColor = ConsoleColor.DarkCyan;
+                Console.ForegroundColor = ConsoleColor.DarkGreen;
+                Console.Write("[");
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.Write("AUTO");
+                Console.ForegroundColor = ConsoleColor.DarkGreen;
                 Console.Write("> ");
-
-                if (bAuto)
-                {
-                    Console.ForegroundColor = ConsoleColor.DarkGreen;
-                    Console.Write("[");
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    Console.Write("AUTO");
-                    Console.ForegroundColor = ConsoleColor.DarkGreen;
-                    Console.Write("> ");
-                }
-
-                Console.ForegroundColor = c;
-                Console.WriteLine(strMsg);
             }
+
+            Console.ForegroundColor = c;
+            Console.WriteLine(strMsg);
         }
 
         void OnSignedOn()
