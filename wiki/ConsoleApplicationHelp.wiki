@@ -1,0 +1,13 @@
+#summary Console Application Useage
+#labels Featured
+
+= Introduction =
+
+Console Application commands are preceded with a forward-slash "/". *Any input without the forward-slash* is considered text and sent to the default conversation. 
+
+= Commands =
+  * /login <usernamae> <password> - login with the given name and password
+  * /send <username> <message> - send a message to the given user
+  * /reply <message> - send message to the last sender of the last incoming message
+  * /current <username> - sets the current or default conversation
+  * /exit - exit the application
