@@ -15,6 +15,12 @@ namespace ConsoleAim
             set { _bAppQuit = value; }
         }
 
+        public bool BuddyNotifications
+        {
+            get;
+            set;
+        }
+
         private Commands _commands;
         private dotTOC.TOC _toc;
         private string _strPrompt = string.Empty;
@@ -46,43 +52,50 @@ namespace ConsoleAim
             return true;
         }
 
-
-
-        void OnUpdateBuddy(string strUser, bool bOnline)
+        void OnUpdateBuddy(Buddy buddy)
         {
-            bool bDoOutput = false;
-            Buddy b = new Buddy(strUser,bOnline ? BuddyStatus.Online : BuddyStatus.Offline);
+            if (_buddyList.ContainsKey(buddy.Name))
+            {
+
+            }
+
+            _buddyList[buddy.Name] = buddy;
+
+            //Console.WriteLine("{0} - {1} ({2})",buddy.Name, buddy.Online,buddy.IdleTime);
+
+            //bool bDoOutput = false;
+            //Buddy b = new Buddy(strUser,bOnline ? BuddyStatus.Online : BuddyStatus.Offline);
             
-            string strStat = @" signed on";
+            //string strStat = @" signed on";
 
-            if (_buddyList.ContainsKey(strUser))
-            {
-                bDoOutput = true;
-                if (!bOnline)
-                {
-                    strStat = @" signed off";
-                }
-            }
-            else if (bOnline)
-            {
-                bDoOutput = true;
-            }
+            //if (_buddyList.ContainsKey(strUser))
+            //{
+            //    bDoOutput = true;
+            //    if (!bOnline)
+            //    {
+            //        strStat = @" signed off";
+            //    }
+            //}
+            //else if (bOnline)
+            //{
+            //    bDoOutput = true;
+            //}
 
-            _buddyList[strUser] = b;
+            //_buddyList[strUser] = b;
 
-            if (bDoOutput)
-            {
-                ConsoleColor c = Console.ForegroundColor;
+            //if (bDoOutput)
+            //{
+            //    ConsoleColor c = Console.ForegroundColor;
 
-                Console.ForegroundColor = ConsoleColor.DarkYellow;
-                Console.Write("[{0}] ", DateTime.Now.ToString("HH:mm:ss"));
+            //    Console.ForegroundColor = ConsoleColor.DarkYellow;
+            //    Console.Write("[{0}] ", DateTime.Now.ToString("HH:mm:ss"));
 
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.Write(strUser);
+            //    Console.ForegroundColor = ConsoleColor.White;
+            //    Console.Write(strUser);
 
-                Console.ForegroundColor = c;
-                Console.WriteLine(strStat);
-            }
+            //    Console.ForegroundColor = c;
+            //    Console.WriteLine(strStat);
+            //}
 
         }
 

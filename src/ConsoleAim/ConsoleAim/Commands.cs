@@ -105,6 +105,30 @@ namespace ConsoleAim
             _controller.Login(parser.Parameters[0], parser.Parameters[1]);
         }
 
+        [CommandMethod("/notifcations <on|off>","turn on/off buddy status notifications")]
+        [MethodAlias(new string[] {"/n","/notifications"})]
+        public void Notifications(CommandParser parser)
+        {
+            if (parser.Parameters.Length == 0)
+            {
+                Console.WriteLine("Useage: /notifications <on|off>");
+                return;
+            }
+
+            if (parser.Parameters[0].ToLower() == "on")
+            {
+                _controller.BuddyNotifications = true;
+            }
+            else if (parser.Parameters[0].ToLower() == "off")
+            {
+                _controller.BuddyNotifications = false;
+            }
+            else
+            {
+                Console.WriteLine("Useage: /notifications <on|off>");
+            }
+        }
+
         [CommandMethod("/reply", "/reply <message>, replies to sender of most recent message")]
         [MethodAlias(new string[] {"/r","/reply"})]
         public void Reply(string strText)
@@ -172,13 +196,29 @@ namespace ConsoleAim
             lock (this)
             {
                 ConsoleColor c = Console.ForegroundColor;
-                Console.ForegroundColor = ConsoleColor.Cyan;
-
-                foreach (Buddy buddy in _controller.BuddyList.Values)
+                
+                foreach (Buddy buddy in _controller.BuddyList.Values.OrderBy(x => x.Name))
                 {
-                    if (buddy.Status == BuddyStatus.Online)
+                    if (buddy.Online && buddy.IdleTime == 0 && !buddy.MarkedUnavailable)
                     {
+                        Console.ForegroundColor = ConsoleColor.DarkYellow;
+                        Console.Write("[{0}] ", DateTime.Now.ToString("HH:mm:ss"));
+                        Console.ForegroundColor = ConsoleColor.Cyan;
                         Console.WriteLine(string.Format("{0} is online", buddy.Name));
+                    }
+                    else if (buddy.Online && buddy.IdleTime != 0 && !buddy.MarkedUnavailable)
+                    {
+                        Console.ForegroundColor = ConsoleColor.DarkYellow;
+                        Console.Write("[{0}] ", DateTime.Now.ToString("HH:mm:ss"));
+                        Console.ForegroundColor = ConsoleColor.DarkCyan;
+                        Console.WriteLine(string.Format("{0} is idle", buddy.Name));
+                    }
+                    else if (buddy.Online && buddy.MarkedUnavailable)
+                    {
+                        Console.ForegroundColor = ConsoleColor.DarkYellow;
+                        Console.Write("[{0}] ", DateTime.Now.ToString("HH:mm:ss"));
+                        Console.ForegroundColor = ConsoleColor.DarkCyan;
+                        Console.WriteLine(string.Format("{0} is away", buddy.Name));
                     }
                 }
                 Console.ForegroundColor = c;
