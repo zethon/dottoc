@@ -1,12 +1,12 @@
 using System;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Net;
 using System.Net.Sockets;
 using System.Diagnostics;
 using System.Threading;
 using System.Collections;
 using System.Timers;
+using System.Text.RegularExpressions;
 
 namespace dotTOC
 {
@@ -90,7 +90,7 @@ namespace dotTOC
         public delegate void OnSendIMHander(string strUser, string strMsg, bool bAuto);
         public event OnSendIMHander OnSendIM;
 
-		public delegate void OnUpdateBubbyHandler(string strUser, bool bOnline);
+		public delegate void OnUpdateBubbyHandler(Buddy buddy);
 		public event OnUpdateBubbyHandler OnUpdateBuddy;
 
 		public delegate void OnEviledHandler(int iLvl, bool bAnonymous, string strSender);
@@ -346,7 +346,7 @@ namespace dotTOC
                 case "UPDATE_BUDDY2":
                     if (OnUpdateBuddy != null)
                     {
-                        OnUpdateBuddy(User.Normalize(strArray[2]), strArray[4] == "T");
+                        OnUpdateBuddy(Buddy.CreateBuddy(strIncoming));
                     }
                     break;
 
@@ -384,9 +384,6 @@ namespace dotTOC
                     break;
             }
         }
-
-
-		
 		#endregion private_functions
 
 		#region public_functions
