@@ -565,6 +565,16 @@ namespace dotTOC
 			Send(strCommand);
 		}
 
+        public void SetAway()
+        {
+            SetAway(string.Empty);
+        }
+
+        public void SetAway(string Awaymessage)
+        {
+            Send(string.Format("toc_set_away \"{0}\"",Encode(Awaymessage)));
+        }
+
 		public void Disconnect()
 		{
             _bDCOnPurpose = true;

@@ -52,60 +52,63 @@ namespace ConsoleAim
             return true;
         }
 
+        public void SetAway(string strAwayText)
+        {
+            _toc.SetAway(strAwayText);
+        }
+
         void OnUpdateBuddy(Buddy buddy)
         {
             if (_buddyList.ContainsKey(buddy.Name))
             {
+                if (buddy.Online != _buddyList[buddy.Name].Online)
+                {
+                    ConsoleColor c = Console.ForegroundColor;
 
+                    Console.ForegroundColor = ConsoleColor.DarkYellow;
+                    Console.Write("[{0}] ", DateTime.Now.ToString("HH:mm:ss"));
+
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.Write(buddy.Name);
+
+                    Console.ForegroundColor = c;
+                    Console.WriteLine(" is {0}",buddy.Online ? "online" : "offline");
+                }
+                else if (buddy.MarkedUnavailable != _buddyList[buddy.Name].MarkedUnavailable)
+                {
+                    ConsoleColor c = Console.ForegroundColor;
+
+                    Console.ForegroundColor = ConsoleColor.DarkYellow;
+                    Console.Write("[{0}] ", DateTime.Now.ToString("HH:mm:ss"));
+
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.Write(buddy.Name);
+
+                    Console.ForegroundColor = c;
+                    Console.WriteLine(" is {0}", buddy.MarkedUnavailable ? "unavailable" : "available");
+                }
+            }
+            else if (buddy.Online)
+            {
+                ConsoleColor c = Console.ForegroundColor;
+
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.Write("[{0}] ", DateTime.Now.ToString("HH:mm:ss"));
+
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.Write(buddy.Name);
+
+                Console.ForegroundColor = c;
+                Console.WriteLine(" is online");
             }
 
             _buddyList[buddy.Name] = buddy;
-
-            //Console.WriteLine("{0} - {1} ({2})",buddy.Name, buddy.Online,buddy.IdleTime);
-
-            //bool bDoOutput = false;
-            //Buddy b = new Buddy(strUser,bOnline ? BuddyStatus.Online : BuddyStatus.Offline);
-            
-            //string strStat = @" signed on";
-
-            //if (_buddyList.ContainsKey(strUser))
-            //{
-            //    bDoOutput = true;
-            //    if (!bOnline)
-            //    {
-            //        strStat = @" signed off";
-            //    }
-            //}
-            //else if (bOnline)
-            //{
-            //    bDoOutput = true;
-            //}
-
-            //_buddyList[strUser] = b;
-
-            //if (bDoOutput)
-            //{
-            //    ConsoleColor c = Console.ForegroundColor;
-
-            //    Console.ForegroundColor = ConsoleColor.DarkYellow;
-            //    Console.Write("[{0}] ", DateTime.Now.ToString("HH:mm:ss"));
-
-            //    Console.ForegroundColor = ConsoleColor.White;
-            //    Console.Write(strUser);
-
-            //    Console.ForegroundColor = c;
-            //    Console.WriteLine(strStat);
-            //}
-
         }
-
-
 
         public void Login(string strUsername, string strPassword)
         {
             _toc.Connect(strUsername, strPassword);
         }
-
 
         public void MainLoop()
         {

@@ -6,14 +6,6 @@ using System.Text.RegularExpressions;
 
 namespace dotTOC
 {
-    public enum BuddyStatus
-    {
-        Unknown,
-        Offline,
-        Online,
-        Idle
-    }
-
     public enum OscarClass
     {
         Unknown,
@@ -40,18 +32,6 @@ namespace dotTOC
             set;
             get;
         }
-
-        //public Buddy(string strName)
-        //{
-        //    Name = strName;
-        //    Status = BuddyStatus.Unknown;
-        //}
-        
-        //public Buddy(string strName, BuddyStatus buddyStatus)
-        //{
-        //    Name = strName;
-        //    Status = buddyStatus;
-        //}
 
         // IComparable implementation
         public int CompareTo(object obj)

@@ -159,6 +159,12 @@ namespace ConsoleAim
             }
         }
 
+        [MethodAlias(new string[] { "/status" })]
+        public void SetAway(string strAwayText)
+        {
+            _controller.SetAway(strAwayText);
+        }
+
         [CommandMethod("/current", "/current <username>, sets the user of the current conversation")]
         [MethodAlias(new string[] { "/c", "/current" })]
         public void SetDefault(CommandParser parser)
@@ -173,6 +179,7 @@ namespace ConsoleAim
                 else
                 {
                     _controller.CurrentUser = parser.Parameters[0];
+                    Console.WriteLine("Default message username: {0}", parser.Parameters[0]);
                 }
             }
             else
