@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("ConsoleAim")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("RiskWatch")]
+[assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("ConsoleAim")]
-[assembly: AssemblyCopyright("Copyright © RiskWatch 2010")]
+[assembly: AssemblyCopyright("Copyright © Adalid Claure 2010")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

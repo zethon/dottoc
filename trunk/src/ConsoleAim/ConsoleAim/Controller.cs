@@ -47,9 +47,21 @@ namespace ConsoleAim
             _toc.OnIMIn += new TOC.OnIMInHandler(OnIMIn);
             _toc.OnUpdateBuddy += new TOC.OnUpdateBubbyHandler(OnUpdateBuddy);
             _toc.OnSendIM += new TOC.OnSendIMHander(OnSendIM);
+            _toc.OnTOCError += new TOC.OnTOCErrorHandler(_toc_OnTOCError);
 
             _commands = new Commands(this);
             return true;
+        }
+
+        void _toc_OnTOCError(TOCError error)
+        {
+            ConsoleColor c = ConsoleColor.DarkYellow;
+            Console.Write("[{0}] ", DateTime.Now.ToString("HH:mm:ss"));
+
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine(string.Format("Error Code ({0}) `{1}`",error.Code,error.Message));
+
+            Console.ForegroundColor = c;
         }
 
         public void SetAway(string strAwayText)

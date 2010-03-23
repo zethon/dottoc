@@ -22,7 +22,7 @@ namespace dotTOC
         {
             public char asterisk;
             public byte frametype;
-            public short seqno;
+            //public short seqno;
             public short datalen;
         };
 
@@ -72,7 +72,7 @@ namespace dotTOC
 		}
 
         #region delegates/callbacks
-        public delegate void OnTOCErrorHandler(string strErrorCode);
+        public delegate void OnTOCErrorHandler(TOCError error);
         public event OnTOCErrorHandler OnTOCError;
 
 		public delegate void OnDisconnectHandler();
@@ -365,8 +365,7 @@ namespace dotTOC
                 case "ERROR":
                     if (OnTOCError != null)
                     {
-                        // 980: invalid credentials
-                        OnTOCError(strArray[2]);
+                        OnTOCError(new TOCError { Code = strArray[2], Message = strArray[4] });
                     }
                     break;
 
