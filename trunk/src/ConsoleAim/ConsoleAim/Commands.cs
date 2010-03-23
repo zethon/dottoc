@@ -68,6 +68,12 @@ namespace ConsoleAim
         {
             _controller.Quit();
         }
+        [CommandMethod("/format","/format <nick>")]
+        [MethodAlias(new string[] {"/format","/f"})]
+        public void FormatNickname(string strNickname)
+        {
+            _controller.TOC.FormatNickname(strNickname);
+        }
 
         [CommandMethod("/help", "this is it")]
         [MethodAlias(new string[] {"/?","/help"})]

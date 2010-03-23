@@ -22,7 +22,16 @@ namespace ConsoleAim
         }
 
         private Commands _commands;
+        
         private dotTOC.TOC _toc;
+        public dotTOC.TOC TOC
+        {
+            get
+            {
+                return _toc;
+            }
+        }
+
         private string _strPrompt = string.Empty;
         private string _strLastUser = string.Empty;
 
@@ -188,7 +197,7 @@ namespace ConsoleAim
         {
             if (_strLastUser != string.Empty && _toc.Connected)
             {
-                _toc.SendMessage(_strLastUser, strMessage);
+                _toc.SendIM(new InstantMessage { From = _strLastUser, Message = strMessage });
             }
         }
 
@@ -217,16 +226,16 @@ namespace ConsoleAim
             }
             else
             {
-                _toc.SendMessage(strUsername, strMessage);                
+                _toc.SendIM(new InstantMessage { To = strUsername, Message = strMessage });                
             }
 
         }
 
-        void OnIMIn(string strUser, string strMessage, bool bAuto)
+        void OnIMIn(InstantMessage im)
         {
             lock (this)
             {
-                _strLastUser = strUser;
+                _strLastUser = im.From;
                 ConsoleColor c = Console.ForegroundColor;
 
                 Console.ForegroundColor = ConsoleColor.DarkYellow;
@@ -235,11 +244,11 @@ namespace ConsoleAim
                 Console.ForegroundColor = ConsoleColor.DarkRed;
                 Console.Write("<");
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.Write(strUser);
+                Console.Write(im.From);
                 Console.ForegroundColor = ConsoleColor.DarkRed;
                 Console.Write("> ");
 
-                if (bAuto)
+                if (im.Auto)
                 {
                     Console.ForegroundColor = ConsoleColor.DarkGreen;
                     Console.Write("[");
@@ -250,14 +259,13 @@ namespace ConsoleAim
                 }
 
                 Console.ForegroundColor = c;
-                Console.WriteLine(strMessage);
-
+                Console.WriteLine(im.Message);
             }
         }
 
-        void OnSendIM(string strUser, string strMsg, bool bAuto)
+        void OnSendIM(InstantMessage im)
         {
-            _strLastUser = strUser;
+            _strLastUser = im.From;
             ConsoleColor c = Console.ForegroundColor;
 
             Console.ForegroundColor = ConsoleColor.DarkYellow;
@@ -270,7 +278,7 @@ namespace ConsoleAim
             Console.ForegroundColor = ConsoleColor.DarkCyan;
             Console.Write("> ");
 
-            if (bAuto)
+            if (im.Auto)
             {
                 Console.ForegroundColor = ConsoleColor.DarkGreen;
                 Console.Write("[");
@@ -281,7 +289,7 @@ namespace ConsoleAim
             }
 
             Console.ForegroundColor = c;
-            Console.WriteLine(strMsg);
+            Console.WriteLine(im.Message);
         }
 
         void OnSignedOn()

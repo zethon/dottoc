@@ -96,10 +96,10 @@ namespace dotTOC
 		public delegate void OnSignedOnHandler();
 		public event OnSignedOnHandler OnSignedOn;
 
-		public delegate void OnIMInHandler(string strUser, string strMsg, bool bAuto);
+		public delegate void OnIMInHandler(InstantMessage im);
 		public event OnIMInHandler OnIMIn;
 
-        public delegate void OnSendIMHander(string strUser, string strMsg, bool bAuto);
+        public delegate void OnSendIMHander(InstantMessage im);
         public event OnSendIMHander OnSendIM;
 
 		public delegate void OnUpdateBubbyHandler(Buddy buddy);
@@ -119,9 +119,6 @@ namespace dotTOC
 		private bool _bDCOnPurpose = false;
 		private Byte[] m_byBuff = new Byte[32767];
 		private int _iSeqNum;
-
-
-	
 
         #region back-end and login functions
         /// <summary>
@@ -306,7 +303,7 @@ namespace dotTOC
                     SetupRecieveCallback(sock);
                 }
             }
-            catch//(Exception ex)
+            catch(Exception ex)
             {
                 // the connection may have dropped
                 if (!sock.Connected && !_bDCOnPurpose)
@@ -359,9 +356,48 @@ namespace dotTOC
         #endregion private_functions
 
 
+		#region server functions
 
+        public void Connect(string strName, string strPW)
+        {
+            _user = new User { Username = strName, DisplayName = strName, Password = strPW };
+            Connect();
+        }
 
-		#region public_functions
+        public bool Connect()
+        {
+            if (_user.GetNormalizeName() != string.Empty)
+            {
+                if (TOCSocket != null && TOCSocket.Connected)
+                {
+                    Disconnect();
+                }
+
+                TOCSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                TOCSocket.Blocking = false;
+                TOCSocket.BeginConnect(Server, Port, new AsyncCallback(OnConnect), TOCSocket);
+                return true;
+            }
+
+            return false;
+        }
+
+        public void Disconnect()
+        {
+            _bDCOnPurpose = true;
+
+            if (TOCSocket != null && TOCSocket.Connected)
+            {
+                TOCSocket.Shutdown(SocketShutdown.Both);
+                TOCSocket.Close();
+
+                // trigger the delegate
+                if (OnDoDisconnect != null)
+                {
+                    OnDoDisconnect();
+                }
+            }
+        }
 
         public static string Encode(string strMessage)
         {
@@ -393,30 +429,6 @@ namespace dotTOC
             return strRetStr;
         }
 
-        public void Connect(string strName, string strPW)
-        {
-            _user = new User { Username = strName, DisplayName = strName, Password = strPW };
-            Connect();
-        }
-
-        public bool Connect()
-        {
-            if (_user.GetNormalizeName() != string.Empty)
-            {
-                if (TOCSocket != null && TOCSocket.Connected)
-                {
-                    Disconnect();
-                }
-
-                TOCSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                TOCSocket.Blocking = false;
-                TOCSocket.BeginConnect(Server, Port, new AsyncCallback(OnConnect), TOCSocket);
-                return true;
-            }
-
-            return false;
-        }
-
         /// <summary>
         /// Sets the user's nickname format
         /// </summary>
@@ -430,27 +442,26 @@ namespace dotTOC
         /// Send a TOC command to the server
         /// </summary>
         /// <param name="szMsg">TOC command to be sent</param>
-		public void Send(string szMsg)
-		{
-			const int TOC_BUFFER = 4096;
+        public void Send(string szMsg)
+        {
+            const int TOC_BUFFER = 4096;
 
-			byte [] packet = new byte[TOC_BUFFER];
-			int msgLen = szMsg.Length+1;
-			szMsg += (char)0;
+            byte[] packet = new byte[TOC_BUFFER];
+            int msgLen = szMsg.Length + 1;
+            szMsg += (char)0;
 
-			Array.Copy(GetFlapHeader(msgLen),packet,6);
-			Array.Copy(Encoding.Default.GetBytes(szMsg),0,packet,6,msgLen);
+            Array.Copy(GetFlapHeader(msgLen), packet, 6);
+            Array.Copy(Encoding.Default.GetBytes(szMsg), 0, packet, 6, msgLen);
 
             if (TOCSocket != null && TOCSocket.Connected)
             {
                 TOCSocket.Send(packet, msgLen + 6, 0);
             }
-		}
+        }
 
-		public void SendMessage(string strUser, string strMsg)
-		{
-			SendMessage(strUser,strMsg,false);
-		}
+        #endregion 
+
+        #region TOC Client Commands
 
         /// <summary>
         /// Send an IM
@@ -458,19 +469,19 @@ namespace dotTOC
         /// <param name="strUser">The destination username of the IM</param>
         /// <param name="strMsg">The message to be sent to the user</param>
         /// <param name="bAuto">A flag indicating if this is an automatic message sent by the client</param>
-		public void SendMessage(string strUser,string strMsg, bool bAuto)
+		public void SendIM(InstantMessage im)
 		{
 			string strText;
 			
             strText = string.Format("toc2_send_im {0} \"{1}\"{2}",
-				User.Normalize(strUser),Encode(strMsg),
-				bAuto ? " auto" : "");
+				User.Normalize(im.To),Encode(im.Message),
+				im.Auto ? " auto" : "");
 			
             Send(strText);
 
             if (OnSendIM != null)
             {
-                OnSendIM(strUser, strMsg, bAuto);
+                OnSendIM(im);
             }
 		}
 
@@ -478,87 +489,77 @@ namespace dotTOC
 
 
 
-		public void AddBuddies(string [] strBuddies)
-		{
-			// TODO: add a 'toc2_del_group test' command to reset the group?
-			string strCommand = "g:test\n";
-			foreach (string strName in strBuddies)
-			{
-				string strTemp = strCommand + "b:"+strName+"\n";
+        //public void AddBuddies(string [] strBuddies)
+        //{
+        //    // TODO: add a 'toc2_del_group test' command to reset the group?
+        //    string strCommand = "g:test\n";
+        //    foreach (string strName in strBuddies)
+        //    {
+        //        string strTemp = strCommand + "b:"+strName+"\n";
 
-				if (strTemp.Length >= 2048)
-				{
-					strCommand = "toc2_new_buddies {"+strCommand+"}";
-					Send(strCommand);
-					Thread.Sleep(150);
-					strCommand = "toc2_new_buddies g:test\n";
-				}
-				else
-					strCommand += "b:"+strName+"\n";
-			}
+        //        if (strTemp.Length >= 2048)
+        //        {
+        //            strCommand = "toc2_new_buddies {"+strCommand+"}";
+        //            Send(strCommand);
+        //            Thread.Sleep(150);
+        //            strCommand = "toc2_new_buddies g:test\n";
+        //        }
+        //        else
+        //            strCommand += "b:"+strName+"\n";
+        //    }
 
-			strCommand = "toc2_new_buddies {"+strCommand+"}";
-			Send(strCommand);
-		}
+        //    strCommand = "toc2_new_buddies {"+strCommand+"}";
+        //    Send(strCommand);
+        //}
 
-
+        /// <summary>
+        /// Sets user's away status as having returned
+        /// </summary>
         public void SetAway()
         {
             SetAway(string.Empty);
         }
 
+        /// <summary>
+        /// Set user's away status
+        /// </summary>
+        /// <param name="Awaymessage">Away status message</param>
         public void SetAway(string Awaymessage)
         {
             Send(string.Format("toc_set_away \"{0}\"",Encode(Awaymessage)));
         }
 
-        public string[] GetConfigBuddies(string strConfig)
-        {
-            ArrayList names = new ArrayList();
+        //public string[] GetConfigBuddies(string strConfig)
+        //{
+        //    ArrayList names = new ArrayList();
 
-            foreach (string strLine in strConfig.Split('\n'))
-            {
-                if (strLine.ToLower().Trim() == "done:")
-                    break;
+        //    foreach (string strLine in strConfig.Split('\n'))
+        //    {
+        //        if (strLine.ToLower().Trim() == "done:")
+        //            break;
 
-                if (strLine.StartsWith("b"))
-                {
-                    string strTemp = strLine.Replace("\r", null);
-                    int i = strTemp.IndexOf(":", 0);
-                    strTemp = strTemp.Remove(0, i + 1);
+        //        if (strLine.StartsWith("b"))
+        //        {
+        //            string strTemp = strLine.Replace("\r", null);
+        //            int i = strTemp.IndexOf(":", 0);
+        //            strTemp = strTemp.Remove(0, i + 1);
 
-                    i = strTemp.IndexOf(":", 0);
-                    strTemp = strTemp.Remove(i, strTemp.Length - (i - 1));
+        //            i = strTemp.IndexOf(":", 0);
+        //            strTemp = strTemp.Remove(i, strTemp.Length - (i - 1));
 
-                    names.Add(User.Normalize(strTemp));
-                }
+        //            names.Add(User.Normalize(strTemp));
+        //        }
 
-            }
+        //    }
 
-            return (string[])names.ToArray(typeof(string));
-        }
+        //    return (string[])names.ToArray(typeof(string));
+        //}
 
 
-		public void Disconnect()
-		{
-            _bDCOnPurpose = true;
-
-            if (TOCSocket != null && TOCSocket.Connected)
-			{
-                TOCSocket.Shutdown(SocketShutdown.Both);
-                TOCSocket.Close();
-                
-                // trigger the delegate
-                if (OnDoDisconnect != null)
-                {
-                    OnDoDisconnect();
-                }
-			}
-		}
 
 		#endregion public_functions
 
-        #region TOC Messages Functions
+        #region TOC Server Messages
 
         [TOCCallback("ERROR")]
         public void DoTOCError(string[] Params)
@@ -597,7 +598,33 @@ namespace dotTOC
         [TOCCallback("CONFIG2")]
         public void DoConfig(string[] Params)
         {
+            string strAll = string.Join(string.Empty, Params);
 
+            foreach (string strLine in strAll.Split('\n'))
+            {
+                if (strLine.ToLower().Trim() == "done:")
+                {
+                    break;
+                }
+
+                if (strLine.StartsWith("b"))
+                {
+                    string strTemp = strLine.Trim();
+                    strTemp = strTemp.Remove(0, 2);
+
+                    Buddy buddy = new Buddy { Name = strTemp };
+
+                }
+                else if (strLine.StartsWith("g"))
+                {
+                    string strTemp = strLine.Trim();
+                    strTemp = strTemp.Remove(0, 2);
+                }
+                else if (strLine.StartsWith("m"))
+                {
+
+                }
+            }
         }
 
         [TOCCallback("EVILED")]
@@ -620,7 +647,14 @@ namespace dotTOC
             if (OnIMIn != null)
             {
                 string strMsg = string.Join("", Params, 8, Params.Length - 8);
-                OnIMIn(User.Normalize(Params[2]), Regex.Replace(strMsg, @"<(.|\n)*?>", string.Empty), Params[4] == "T");
+                InstantMessage im = new InstantMessage
+                {
+                    From = Params[2],
+                    Message = Regex.Replace(strMsg, @"<(.|\n)*?>", string.Empty),
+                    Auto = Params[4] == "T"
+                };
+
+                OnIMIn(im);
             }
         }
 
