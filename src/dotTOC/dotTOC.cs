@@ -10,6 +10,14 @@ using System.Text.RegularExpressions;
 
 namespace dotTOC
 {
+    public enum FLAPTYPE
+    {
+		FT_SIGNON	    = 1,
+		FT_DATA		    = 2,
+		FT_ERROR		= 3,	// not used by TOC
+		FT_SIGNOFF	    = 4,	// not used by TOC
+		FT_KEEPALIVE	= 5
+    }
 	/// <summary>
 	/// Summary description for Class1.
 	/// </summary>
@@ -22,27 +30,13 @@ namespace dotTOC
         {
             public char asterisk;
             public byte frametype;
-            //public short seqno;
             public short datalen;
         };
 
-        private string _strServer = "toc.oscar.aol.com";
-        public string Server
-        {
-            get { return _strServer; }
-        }
+        public string Server = "toc.oscar.aol.com";
+        public int Port = 9898;
 
-        private int _iPort = 9898;
-        public int Port
-        {
-            get { return _iPort; }
-        }
-
-        private Socket _socket;
-        public Socket TOCSocket
-        {
-            get { return _socket; }
-        }
+        public Socket TOCSocket = null;
 
         private User _user;
         public User User
@@ -50,11 +44,8 @@ namespace dotTOC
             get { return _user; }
         }
 
-        public string _strClientInfo = "dotTOC - .NET TOC Library";
-        public string ClientInfo
-        {
-            get { return _strClientInfo; }
-        }
+        public string ClientInfo = "dotTOC - .NET TOC Library";
+
 
 		public bool Connected
 		{
@@ -103,36 +94,11 @@ namespace dotTOC
 		public event OnChatJoinedHandler OnChatJoined;
         #endregion
 
-        // data types received from server
-		private const byte FT_SIGNON	= 1;
-		private const byte FT_DATA		= 2;
-		private const byte FT_ERROR		= 3;	// not used by TOC
-		private const byte FT_SIGNOFF	= 4;	// not used by TOC
-		private const byte FT_KEEPALIVE	= 5;
-
 		// privates
 		private bool _bDCOnPurpose = false;
 		private Byte[] m_byBuff = new Byte[32767];
 		private int _iSeqNum;
 	
-		#region contructors
-		public TOC()
-		{
-			_user = new User();
-		}
-
-		public TOC(string strName, string strPW)
-		{
-            _user = new User(strName, strPW);
-		}
-
-		public TOC(string strServer, int iPort)
-		{
-			_strServer = strServer;
-			iPort = _iPort;
-		}
-		#endregion constructors
-
 		#region private_functions
 		public string [] GetConfigBuddies(string strConfig)
 		{	
@@ -448,9 +414,9 @@ namespace dotTOC
                 Disconnect();
             }
 
-		    _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-		    _socket.Blocking = false ;	
-            _socket.BeginConnect(Server, Port, new AsyncCallback(OnConnect), _socket);
+            TOCSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            TOCSocket.Blocking = false;
+            TOCSocket.BeginConnect(Server, Port, new AsyncCallback(OnConnect), TOCSocket);
 		}
 
         public void OnConnect(IAsyncResult ar)
@@ -488,8 +454,9 @@ namespace dotTOC
 			try
 			{
 				int nBytesRead = 0;
-				int nBytesRec = sock.EndReceive( ar );
-				if( nBytesRec > 0 )
+				int nBytesRec = sock.EndReceive(ar);
+
+				if (nBytesRec > 0)
 				{
 					do 	
 					{
@@ -502,25 +469,25 @@ namespace dotTOC
 					
 						switch (fh.frametype)
 						{
-							case FT_SIGNON:
+							case ((byte)FLAPTYPE.FT_SIGNON):
 								SendFlapSignOn();
 								SendUserSignOn();
-								break;
+							break;
 						
-							case FT_DATA:
+							case ((byte)FLAPTYPE.FT_DATA):
 								string sRecieved = Encoding.ASCII.GetString(m_byBuff,nBytesRead+6,fh.datalen);
 								Dispatch(sRecieved);
 							break;
 
 							default:
-								break;
+                            break;
 						}		
 		
 						nBytesRead += fh.datalen + 6;
 
 					} while (nBytesRead < nBytesRec);
 
-					SetupRecieveCallback (sock);
+					SetupRecieveCallback(sock);
 				}
 			}
 			catch//(Exception ex)
@@ -590,5 +557,7 @@ namespace dotTOC
 		}
 
 		#endregion public_functions
-	}
+
+
+    }
 }
