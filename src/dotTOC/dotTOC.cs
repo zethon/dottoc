@@ -48,6 +48,7 @@ namespace dotTOC
         public int Port = 9898;
 
         public Socket TOCSocket = null;
+        //public User CurrentUser;
 
         private User _user;
         public User User
@@ -157,7 +158,7 @@ namespace dotTOC
 			
 			byte[] packet = new byte[255];
 
-            int msglen = 8 + _user.GetName().Length;
+            int msglen = 8 + _user.GetNormalizeName().Length;
 			int packetlen = 6 + msglen;
 
 			Array.Copy(GetFlapHeader(msglen,1),packet,6);
@@ -169,10 +170,10 @@ namespace dotTOC
 			packet[10] = 0;
 			packet[11] = (byte)BitConverter.ToChar(BitConverter.GetBytes(TLV_VERSION),0);
 
-            packet[12] = (byte)BitConverter.ToChar(BitConverter.GetBytes(_user.GetName().Length), 1);
-            packet[13] = (byte)BitConverter.ToChar(BitConverter.GetBytes(_user.GetName().Length), 0);
+            packet[12] = (byte)BitConverter.ToChar(BitConverter.GetBytes(_user.GetNormalizeName().Length), 1);
+            packet[13] = (byte)BitConverter.ToChar(BitConverter.GetBytes(_user.GetNormalizeName().Length), 0);
 
-            Array.Copy(Encoding.ASCII.GetBytes(User.GetName()), 0, packet, 14, User.GetName().Length);
+            Array.Copy(Encoding.ASCII.GetBytes(User.GetNormalizeName()), 0, packet, 14, User.GetNormalizeName().Length);
 			TOCSocket.Send(packet,packetlen,0);
 		}
 
@@ -181,8 +182,8 @@ namespace dotTOC
         /// Note: was changed from toc_signon to toc2_signon for TOC2
         /// </summary>
 		private void SendUserSignOn()
-		{	
-			string strLogin = User.GetName();
+		{
+            string strLogin = User.GetNormalizeName();
 			string strPassword = User.GetPassword(PasswordFormat.Raw);
 
 			int code1 = (strLogin[0] - 96) * 7696 + 738816;
@@ -192,7 +193,7 @@ namespace dotTOC
 			strMsg = string.Format("toc2_signon {0} {1} {2} {3} {4} {5} {6} {7}",
 				"login.oscar.aol.com",
 				5190,
-				User.GetName(),
+                User.GetNormalizeName(),
 				User.GetPassword(),
 				"english",
 				"\"TIC:QuickBuddy\"",
@@ -297,88 +298,21 @@ namespace dotTOC
 
             foreach (MethodInfo mit in this.GetType().GetMethods())
             {
-                //Console.WriteLine("Method Name: {0}", mit.Name);
                 foreach (object obj in mit.GetCustomAttributes(typeof(TOCCallbackAttribute), false))
                 {
                     TOCCallbackAttribute callname = obj as TOCCallbackAttribute;
-                    if (callname != null)
+                    if (callname != null && callname.Callback.ToLower() == strArray[0].ToLower())
                     {
-                        mit.Invoke(this, new object[] { strArray });
+                        if (mit.GetParameters() != null && mit.GetParameters().Length > 0)
+                        {
+                            mit.Invoke(this, new object[] { strArray });
+                        }
+                        else
+                        {
+                            mit.Invoke(this, null);
+                        }
                     }
                 }
-            }
-
-            switch (strArray[0])
-            {
-
-                case "CONFIG2":
-                    //if (AutoAddBuddies)
-                    //	AddBuddies(GetConfigBuddies(strIncoming));
-                break;
-
-                case "SIGN_ON":
-                    Send("toc_add_buddy " + User.GetName());
-                    Send("toc_set_info \"" + ClientInfo + "\"");
-                    Send("toc_init_done");
-                    if (OnSignedOn != null)
-                    {
-                        OnSignedOn();
-                    }
-                break;
-
-                case "IM_IN2":
-                if (OnIMIn != null)
-                {
-                    string strMsg = string.Join("", strArray, 8, strArray.Length - 8);
-                    OnIMIn(User.Normalize(strArray[2]), Regex.Replace(strMsg, @"<(.|\n)*?>", string.Empty), strArray[4] == "T");
-                }
-                break;
-
-                case "UPDATE_BUDDY2":
-                    if (OnUpdateBuddy != null)
-                    {
-                        OnUpdateBuddy(Buddy.CreateBuddy(strIncoming));
-                    }
-                    break;
-
-                case "EVILED":
-                    if (OnEviled != null)
-                    {
-                        int iLvl = int.Parse(strArray[2]);
-
-                        if (strArray.Length == 5)
-                            OnEviled(iLvl, false, User.Normalize(strArray[4]));
-                        else if (strArray.Length == 4)
-                            OnEviled(iLvl, true, "");
-                    }
-                    break;
-
-                //case "ERROR":
-                //    if (OnTOCError != null)
-                //    {
-                //        if (strArray.Length > 4)
-                //        {
-                //            OnTOCError(new TOCError { Code = strArray[2], Argument = strArray[4] });
-                //        }
-                //        else
-                //        {
-                //            OnTOCError(new TOCError { Code = strArray[2] });
-                //        }
-                //    }
-                //    break;
-
-                case "CHAT_JOIN":
-                    if (OnChatJoined != null)
-                    {
-                        OnChatJoined(strArray[2], strArray[4]);
-                    }
-                    break;
-
-                case "CLIENT_EVENT2":
-                    break;
-
-                default:
-                    break;
             }
         }
 		#endregion private_functions
@@ -435,20 +369,26 @@ namespace dotTOC
 
 		public void Connect(string strName, string strPW)
 		{
-			_user = new User(strName,strPW);
+            _user = new User { Username = strName, DisplayName = strName, Password = strPW };
 			Connect();
 		}
 
-		public void Connect()
+		public bool Connect()
 		{
-            if (TOCSocket != null && TOCSocket.Connected)
+            if (_user.GetNormalizeName() != string.Empty)
             {
-                Disconnect();
+                if (TOCSocket != null && TOCSocket.Connected)
+                {
+                    Disconnect();
+                }
+
+                TOCSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                TOCSocket.Blocking = false;
+                TOCSocket.BeginConnect(Server, Port, new AsyncCallback(OnConnect), TOCSocket);
+                return true;
             }
 
-            TOCSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            TOCSocket.Blocking = false;
-            TOCSocket.BeginConnect(Server, Port, new AsyncCallback(OnConnect), TOCSocket);
+            return false;
 		}
 
         public void OnConnect(IAsyncResult ar)
@@ -608,6 +548,35 @@ namespace dotTOC
             }
         }
 
+        [TOCCallback("CHAT_JOIN")]
+        public void DoChatJoin(string[] Params)
+        {
+            if (OnChatJoined != null)
+            {
+                OnChatJoined(Params[2], Params[4]);
+            }
+        }
+
+        [TOCCallback("CONFIG2")]
+        public void DoConfig(string[] Params)
+        {
+
+        }
+
+        [TOCCallback("EVILED")]
+        public void DoEviled(string[] Params)
+        {
+            if (OnEviled != null)
+            {
+                int iLvl = int.Parse(Params[2]);
+
+                if (Params.Length == 5)
+                    OnEviled(iLvl, false, User.Normalize(Params[4]));
+                else if (Params.Length == 4)
+                    OnEviled(iLvl, true, "");
+            }
+        }
+
         [TOCCallback("IM_IN2")]
         public void DoIMIn(string[] Params)
         {
@@ -618,6 +587,34 @@ namespace dotTOC
             }
         }
 
+        [TOCCallback("NICK")]
+        public void DoNick(string[] Params)
+        {
+            //CurrentUser.DisplayName = Params[3];
+
+        }
+
+        [TOCCallback("SIGN_ON")]
+        public void DoSignOn()
+        {
+            Send("toc_add_buddy " + _user.GetNormalizeName());
+            Send("toc_set_info \"" + ClientInfo + "\"");
+            Send("toc_init_done");
+            if (OnSignedOn != null)
+            {
+                OnSignedOn();
+            }
+        }
+
+        [TOCCallback("UPDATE_BUDDY2")]
+        public void DoUpdateBuddy(string[] Params)
+        {
+            if (OnUpdateBuddy != null)
+            {
+                string strIncoming = string.Join(string.Empty, Params);
+                OnUpdateBuddy(Buddy.CreateBuddy(strIncoming));
+            }
+        }
         #endregion
     }
 }
