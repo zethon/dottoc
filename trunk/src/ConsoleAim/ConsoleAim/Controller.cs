@@ -55,7 +55,7 @@ namespace ConsoleAim
 
         void OnTOCError(TOCError error)
         {
-            ConsoleColor c = ConsoleColor.DarkYellow;
+            ConsoleColor c = Console.ForegroundColor;
             Console.Write("[{0}] ", DateTime.Now.ToString("HH:mm:ss"));
 
             Console.ForegroundColor = ConsoleColor.White;
