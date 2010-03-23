@@ -203,29 +203,31 @@ namespace ConsoleAim
             lock (this)
             {
                 ConsoleColor c = Console.ForegroundColor;
-                
+
                 foreach (Buddy buddy in _controller.BuddyList.Values.OrderBy(x => x.Name))
                 {
+                    string strMobile = buddy.Class == OscarClass.Wireless ? "(m)" : string.Empty;
+
                     if (buddy.Online && buddy.IdleTime == 0 && !buddy.MarkedUnavailable)
                     {
                         Console.ForegroundColor = ConsoleColor.DarkYellow;
                         Console.Write("[{0}] ", DateTime.Now.ToString("HH:mm:ss"));
                         Console.ForegroundColor = ConsoleColor.Cyan;
-                        Console.WriteLine(string.Format("{0} is online", buddy.Name));
+                        Console.WriteLine(string.Format("{0} is online {1}", buddy.Name,strMobile));
                     }
                     else if (buddy.Online && buddy.IdleTime != 0 && !buddy.MarkedUnavailable)
                     {
                         Console.ForegroundColor = ConsoleColor.DarkYellow;
                         Console.Write("[{0}] ", DateTime.Now.ToString("HH:mm:ss"));
                         Console.ForegroundColor = ConsoleColor.DarkCyan;
-                        Console.WriteLine(string.Format("{0} is idle", buddy.Name));
+                        Console.WriteLine(string.Format("{0} is idle {1}", buddy.Name, strMobile));
                     }
                     else if (buddy.Online && buddy.MarkedUnavailable)
                     {
                         Console.ForegroundColor = ConsoleColor.DarkYellow;
                         Console.Write("[{0}] ", DateTime.Now.ToString("HH:mm:ss"));
                         Console.ForegroundColor = ConsoleColor.DarkCyan;
-                        Console.WriteLine(string.Format("{0} is away", buddy.Name));
+                        Console.WriteLine(string.Format("{0} is away {1}", buddy.Name, strMobile));
                     }
                 }
                 Console.ForegroundColor = c;
