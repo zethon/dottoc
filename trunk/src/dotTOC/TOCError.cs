@@ -7,7 +7,7 @@ namespace dotTOC
 {
     public class TOCError
     {
-        public string Code;
-        public string Message;
+        public string Code = string.Empty;
+        public string Message = string.Empty;
     }
 }

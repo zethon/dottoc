@@ -365,7 +365,7 @@ namespace dotTOC
                 case "ERROR":
                     if (OnTOCError != null)
                     {
-                        OnTOCError(new TOCError { Code = strArray[2], Message = strArray[4] });
+                        OnTOCError(new TOCError { Code = strArray[2]});
                     }
                     break;
 
@@ -472,7 +472,7 @@ namespace dotTOC
                     //DispatchError("Connection failed.");
                 }
 			}
-			catch (Exception ex)
+			catch// (Exception ex)
 			{
                 // TODO: rethink the try/catch handling
                 //       * should it be handled in this module
@@ -496,11 +496,9 @@ namespace dotTOC
 						flap_header fh = new flap_header();
 						fh.asterisk = (char)m_byBuff[nBytesRead+0];
 						fh.frametype = (byte)m_byBuff[nBytesRead+1];
-					
-						byte [] byteTemp = new byte[2];
-						byteTemp[1] = m_byBuff[nBytesRead+4];
-						byteTemp[0] = m_byBuff[nBytesRead+5];
-						fh.datalen = BitConverter.ToInt16(byteTemp,0);
+
+                        byte[] byteTemp = { m_byBuff[nBytesRead + 5], m_byBuff[nBytesRead + 4] };
+                        fh.datalen = BitConverter.ToInt16(byteTemp, 0);
 					
 						switch (fh.frametype)
 						{
@@ -525,7 +523,7 @@ namespace dotTOC
 					SetupRecieveCallback (sock);
 				}
 			}
-			catch(Exception ex)
+			catch//(Exception ex)
 			{
                 // the connection may have dropped
                 if (!sock.Connected && !_bDCOnPurpose)
