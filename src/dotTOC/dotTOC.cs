@@ -1,3 +1,13 @@
+/* SVN FILE: $Id$ */
+/**
+* dotTOC : .NET Library for AOL's TOC Protocol
+*
+* @version $Revision$
+* @lastrevision $Date$
+* @modifiedby $LastChangedBy$
+* @lastmodified $LastChangedDate$
+*/
+
 using System;
 using System.Text;
 using System.Net;
