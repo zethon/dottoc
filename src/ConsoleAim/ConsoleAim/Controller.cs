@@ -57,19 +57,16 @@ namespace ConsoleAim
         {
             ConsoleColor c = Console.ForegroundColor;
             Console.Write("[{0}] ", DateTime.Now.ToString("HH:mm:ss"));
-
             Console.ForegroundColor = ConsoleColor.White;
 
-            if (error.Message != string.Empty)
+            if (error.Argument != string.Empty)
             {
-                Console.WriteLine(string.Format("Error Code ({0}) \"{1}\"",error.Code,error.Message));
+                Console.WriteLine(string.Format("Error Code {0} ({1})",error.Code,error.Argument));
             }
             else
             {
-                Console.WriteLine(string.Format("Error Code ({0})",error.Code));
+                Console.WriteLine(string.Format("Error Code {0}",error.Code));
             }
-
-
 
             Console.ForegroundColor = c;
         }

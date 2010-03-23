@@ -8,6 +8,6 @@ namespace dotTOC
     public class TOCError
     {
         public string Code = string.Empty;
-        public string Message = string.Empty;
+        public string Argument = string.Empty;
     }
 }

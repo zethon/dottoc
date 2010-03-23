@@ -12,6 +12,8 @@ namespace dotTOC
     /// </summary>
     public class User
     {
+        public string DisplayName = string.Empty;
+
         private string _strName;
         public string UserName
         {
