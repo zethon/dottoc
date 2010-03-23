@@ -1,4 +1,4 @@
-/* SVN FILE: $Id$ */
+/* SVN FILE: $Header$ */
 /**
 * dotTOC : .NET Library for AOL's TOC Protocol
 *
@@ -363,7 +363,6 @@ namespace dotTOC
 
 		#region public_functions
 
-
         public static string Encode(string strMessage)
         {
             string strRetStr = "";
@@ -392,6 +391,39 @@ namespace dotTOC
             }
 
             return strRetStr;
+        }
+
+        public void Connect(string strName, string strPW)
+        {
+            _user = new User { Username = strName, DisplayName = strName, Password = strPW };
+            Connect();
+        }
+
+        public bool Connect()
+        {
+            if (_user.GetNormalizeName() != string.Empty)
+            {
+                if (TOCSocket != null && TOCSocket.Connected)
+                {
+                    Disconnect();
+                }
+
+                TOCSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                TOCSocket.Blocking = false;
+                TOCSocket.BeginConnect(Server, Port, new AsyncCallback(OnConnect), TOCSocket);
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Sets the user's nickname format
+        /// </summary>
+        /// <param name="strFormat">The format of the user's nickname</param>
+        public void FormatNickname(string strFormat)
+        {
+            Send(string.Format("toc_format_nickname {0}", Encode(strFormat)));
         }
 
         /// <summary>
@@ -442,29 +474,7 @@ namespace dotTOC
             }
 		}
 
-		public void Connect(string strName, string strPW)
-		{
-            _user = new User { Username = strName, DisplayName = strName, Password = strPW };
-			Connect();
-		}
 
-		public bool Connect()
-		{
-            if (_user.GetNormalizeName() != string.Empty)
-            {
-                if (TOCSocket != null && TOCSocket.Connected)
-                {
-                    Disconnect();
-                }
-
-                TOCSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                TOCSocket.Blocking = false;
-                TOCSocket.BeginConnect(Server, Port, new AsyncCallback(OnConnect), TOCSocket);
-                return true;
-            }
-
-            return false;
-		}
 
 
 
@@ -566,6 +576,15 @@ namespace dotTOC
             }
         }
 
+        [TOCCallback("ADMIN_NICK_STATUS")]
+        public void DoAdminNickStatus(string[] Params)
+        {
+            if (Params[2] == @"0")
+            {
+                // TODO: inmplement delegate/event
+            }
+        }
+
         [TOCCallback("CHAT_JOIN")]
         public void DoChatJoin(string[] Params)
         {
@@ -608,8 +627,7 @@ namespace dotTOC
         [TOCCallback("NICK")]
         public void DoNick(string[] Params)
         {
-            //CurrentUser.DisplayName = Params[3];
-
+            User.DisplayName = Params[2];
         }
 
         [TOCCallback("SIGN_ON")]
