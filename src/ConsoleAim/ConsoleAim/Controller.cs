@@ -266,7 +266,7 @@ namespace ConsoleAim
             Console.ForegroundColor = ConsoleColor.DarkCyan;
             Console.Write("<");
             Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.Write(_toc.User.UserName);
+            Console.Write(_toc.User.Username);
             Console.ForegroundColor = ConsoleColor.DarkCyan;
             Console.Write("> ");
 

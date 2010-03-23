@@ -122,33 +122,8 @@ namespace dotTOC
 
 
 	
-		#region private_functions
-		public string [] GetConfigBuddies(string strConfig)
-		{	
-			ArrayList names = new ArrayList();
 
-			foreach(string strLine in strConfig.Split('\n'))
-			{	
-				if (strLine.ToLower().Trim() == "done:")
-					break;
-				
-				if (strLine.StartsWith("b"))
-				{
-					string strTemp = strLine.Replace("\r",null);
-					int i = strTemp.IndexOf(":",0);
-					strTemp = strTemp.Remove(0,i+1);
-					
-					i = strTemp.IndexOf(":",0);
-					strTemp = strTemp.Remove(i,strTemp.Length-(i-1));
-
-					names.Add(User.Normalize(strTemp));
-				}
-				
-			}
-
-			return (string []) names.ToArray(typeof(string));
-		}
-
+        #region back-end and login functions
         /// <summary>
         /// First message sent to server after connection
         /// </summary>
@@ -258,39 +233,94 @@ namespace dotTOC
 		{
 		    AsyncCallback recieveData = new AsyncCallback(OnRecievedData);
 		    sock.BeginReceive(m_byBuff, 0, m_byBuff.Length, SocketFlags.None,recieveData, sock);
-		}
+        }
 
+        private void OnConnect(IAsyncResult ar)
+        {
+            Socket sock = (Socket)ar.AsyncState;
 
-		public static string Encode(string strMessage)
-		{
-			string strRetStr = "";
+            // Check if we were sucessfull
+            try
+            {
+                if (sock.Connected)
+                {
+                    _bDCOnPurpose = false;
+                    SendFlapInit();
+                    SetupRecieveCallback(sock);
+                }
+                else
+                {
+                    // TODO: OnConnectErrorHandler?
+                    //DispatchError("Connection failed.");
+                }
+            }
+            catch// (Exception ex)
+            {
+                // TODO: rethink the try/catch handling
+                //       * should it be handled in this module
+                //       * what kind, if any, should?
+                //DispatchError(ex.Message);
+            }
+        }
 
-			for (int i=0;i < strMessage.Length;i++)
-			{
-				switch(strMessage[i]) 
-				{
-					case '$':
-					case '{':
-					case '}':
-					case '[':
-					case ']':
-					case '(':
-					case ')':
-					case '"':
-					case '\\':
-						strRetStr += '\\';
-					break;
-			
-					default: 
-					break;
-				}
+        private void OnRecievedData(IAsyncResult ar)
+        {
+            Socket sock = (Socket)ar.AsyncState;
 
-				strRetStr += strMessage[i];
-			}
+            try
+            {
+                int nBytesRead = 0;
+                int nBytesRec = sock.EndReceive(ar);
 
-			return strRetStr;
-		}
+                if (nBytesRec > 0)
+                {
+                    do
+                    {
+                        flap_header fh = new flap_header();
+                        fh.asterisk = (char)m_byBuff[nBytesRead + 0];
+                        fh.frametype = (byte)m_byBuff[nBytesRead + 1];
 
+                        byte[] byteTemp = { m_byBuff[nBytesRead + 5], m_byBuff[nBytesRead + 4] };
+                        fh.datalen = BitConverter.ToInt16(byteTemp, 0);
+
+                        switch (fh.frametype)
+                        {
+                            case ((byte)FLAPTYPE.FT_SIGNON):
+                                SendFlapSignOn();
+                                SendUserSignOn();
+                                break;
+
+                            case ((byte)FLAPTYPE.FT_DATA):
+                                string sRecieved = Encoding.ASCII.GetString(m_byBuff, nBytesRead + 6, fh.datalen);
+                                Dispatch(sRecieved);
+                                break;
+
+                            default:
+                                break;
+                        }
+
+                        nBytesRead += fh.datalen + 6;
+
+                    } while (nBytesRead < nBytesRec);
+
+                    SetupRecieveCallback(sock);
+                }
+            }
+            catch//(Exception ex)
+            {
+                // the connection may have dropped
+                if (!sock.Connected && !_bDCOnPurpose)
+                {
+                    sock.Shutdown(SocketShutdown.Both);
+                    sock.Close();
+
+                    if (OnDisconnect != null)
+                    {
+                        OnDisconnect();
+                    }
+                }
+            }
+        }
 
         /// <summary>
         /// Parses and dispataches the incoming server message to the appropriate handlers.
@@ -325,9 +355,44 @@ namespace dotTOC
                 }
             }
         }
-		#endregion private_functions
+
+        #endregion private_functions
+
+
+
 
 		#region public_functions
+
+
+        public static string Encode(string strMessage)
+        {
+            string strRetStr = "";
+
+            for (int i = 0; i < strMessage.Length; i++)
+            {
+                switch (strMessage[i])
+                {
+                    case '$':
+                    case '{':
+                    case '}':
+                    case '[':
+                    case ']':
+                    case '(':
+                    case ')':
+                    case '"':
+                    case '\\':
+                        strRetStr += '\\';
+                        break;
+
+                    default:
+                        break;
+                }
+
+                strRetStr += strMessage[i];
+            }
+
+            return strRetStr;
+        }
 
         /// <summary>
         /// Send a TOC command to the server
@@ -401,92 +466,7 @@ namespace dotTOC
             return false;
 		}
 
-        public void OnConnect(IAsyncResult ar)
-		{
-			Socket sock = (Socket)ar.AsyncState;
 
-			// Check if we were sucessfull
-			try
-			{
-                if (sock.Connected)
-                {
-                    _bDCOnPurpose = false;
-                    SendFlapInit();
-                    SetupRecieveCallback(sock);
-                }
-                else
-                {
-                    // TODO: OnConnectErrorHandler?
-                    //DispatchError("Connection failed.");
-                }
-			}
-			catch// (Exception ex)
-			{
-                // TODO: rethink the try/catch handling
-                //       * should it be handled in this module
-                //       * what kind, if any, should?
-				//DispatchError(ex.Message);
-			}  
-		}
-
-		public void OnRecievedData( IAsyncResult ar )
-		{
-			Socket sock = (Socket)ar.AsyncState;
-
-			try
-			{
-				int nBytesRead = 0;
-				int nBytesRec = sock.EndReceive(ar);
-
-				if (nBytesRec > 0)
-				{
-					do 	
-					{
-						flap_header fh = new flap_header();
-						fh.asterisk = (char)m_byBuff[nBytesRead+0];
-						fh.frametype = (byte)m_byBuff[nBytesRead+1];
-
-                        byte[] byteTemp = { m_byBuff[nBytesRead + 5], m_byBuff[nBytesRead + 4] };
-                        fh.datalen = BitConverter.ToInt16(byteTemp, 0);
-					
-						switch (fh.frametype)
-						{
-							case ((byte)FLAPTYPE.FT_SIGNON):
-								SendFlapSignOn();
-								SendUserSignOn();
-							break;
-						
-							case ((byte)FLAPTYPE.FT_DATA):
-								string sRecieved = Encoding.ASCII.GetString(m_byBuff,nBytesRead+6,fh.datalen);
-								Dispatch(sRecieved);
-							break;
-
-							default:
-                            break;
-						}		
-		
-						nBytesRead += fh.datalen + 6;
-
-					} while (nBytesRead < nBytesRec);
-
-					SetupRecieveCallback(sock);
-				}
-			}
-			catch//(Exception ex)
-			{
-                // the connection may have dropped
-                if (!sock.Connected && !_bDCOnPurpose)
-                {
-                    sock.Shutdown(SocketShutdown.Both);
-                    sock.Close();
-
-                    if (OnDisconnect != null)
-                    {
-                        OnDisconnect();
-                    }
-                }
-			}
-		}
 
 		public void AddBuddies(string [] strBuddies)
 		{
@@ -511,6 +491,7 @@ namespace dotTOC
 			Send(strCommand);
 		}
 
+
         public void SetAway()
         {
             SetAway(string.Empty);
@@ -520,6 +501,33 @@ namespace dotTOC
         {
             Send(string.Format("toc_set_away \"{0}\"",Encode(Awaymessage)));
         }
+
+        public string[] GetConfigBuddies(string strConfig)
+        {
+            ArrayList names = new ArrayList();
+
+            foreach (string strLine in strConfig.Split('\n'))
+            {
+                if (strLine.ToLower().Trim() == "done:")
+                    break;
+
+                if (strLine.StartsWith("b"))
+                {
+                    string strTemp = strLine.Replace("\r", null);
+                    int i = strTemp.IndexOf(":", 0);
+                    strTemp = strTemp.Remove(0, i + 1);
+
+                    i = strTemp.IndexOf(":", 0);
+                    strTemp = strTemp.Remove(i, strTemp.Length - (i - 1));
+
+                    names.Add(User.Normalize(strTemp));
+                }
+
+            }
+
+            return (string[])names.ToArray(typeof(string));
+        }
+
 
 		public void Disconnect()
 		{
