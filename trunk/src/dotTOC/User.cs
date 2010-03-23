@@ -4,7 +4,6 @@ using System.Text;
 
 namespace dotTOC
 {
-    public enum NameFormat { Raw, Normalized }
     public enum PasswordFormat { Raw, Roasted }
 
     /// <summary>
@@ -12,45 +11,13 @@ namespace dotTOC
     /// </summary>
     public class User
     {
+        public string Username = string.Empty;
         public string DisplayName = string.Empty;
+        public string Password = string.Empty;
 
-        private string _strName;
-        public string UserName
+        public string GetNormalizeName()
         {
-            get { return _strName; }
-        }
-
-        private string _strPW;
-        public string Password
-        {
-            get { return _strPW; }
-        }
-
-        public User()
-        {
-        }
-
-        public User(string strName, string strPW)
-        {
-            _strName = strName;
-            _strPW = strPW;
-        }
-
-        public string GetName()
-        {
-            return GetName(NameFormat.Normalized);
-        }
-
-        public string GetName(NameFormat nt)
-        {
-            string strRetVal = _strName;
-
-            if (nt == NameFormat.Normalized)
-            {
-                strRetVal = Normalize(strRetVal);
-            }
-
-            return strRetVal;
+            return Normalize(Username);
         }
 
         public string GetPassword()
@@ -60,7 +27,7 @@ namespace dotTOC
 
         public string GetPassword(PasswordFormat pt)
         {
-            string strRetVal = _strPW;
+            string strRetVal = Password;
 
             if (pt == PasswordFormat.Roasted)
             {
