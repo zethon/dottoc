@@ -7,6 +7,7 @@ using System.Threading;
 using System.Collections;
 using System.Timers;
 using System.Text.RegularExpressions;
+using System.Reflection;
 
 namespace dotTOC
 {
@@ -33,6 +34,16 @@ namespace dotTOC
             public short datalen;
         };
 
+        private class TOCCallbackAttribute : System.Attribute
+        {
+            public string Callback = string.Empty;
+
+            public TOCCallbackAttribute(string callback)
+            {
+                Callback = callback;
+            }
+        }
+
         public string Server = "toc.oscar.aol.com";
         public int Port = 9898;
 
@@ -45,7 +56,6 @@ namespace dotTOC
         }
 
         public string ClientInfo = "dotTOC - .NET TOC Library";
-
 
 		public bool Connected
 		{
@@ -98,6 +108,8 @@ namespace dotTOC
 		private bool _bDCOnPurpose = false;
 		private Byte[] m_byBuff = new Byte[32767];
 		private int _iSeqNum;
+
+
 	
 		#region private_functions
 		public string [] GetConfigBuddies(string strConfig)
@@ -283,6 +295,19 @@ namespace dotTOC
             Regex r = new Regex("(:)"); // Split on colon
             string[] strArray = r.Split(strIncoming);
 
+            foreach (MethodInfo mit in this.GetType().GetMethods())
+            {
+                //Console.WriteLine("Method Name: {0}", mit.Name);
+                foreach (object obj in mit.GetCustomAttributes(typeof(TOCCallbackAttribute), false))
+                {
+                    TOCCallbackAttribute callname = obj as TOCCallbackAttribute;
+                    if (callname != null)
+                    {
+                        mit.Invoke(this, new object[] { strArray });
+                    }
+                }
+            }
+
             switch (strArray[0])
             {
 
@@ -302,12 +327,12 @@ namespace dotTOC
                 break;
 
                 case "IM_IN2":
-                    if (OnIMIn != null)
-                    {
-                        string strMsg = string.Join("", strArray, 8, strArray.Length - 8);
-                        OnIMIn(User.Normalize(strArray[2]), Regex.Replace(strMsg, @"<(.|\n)*?>", string.Empty), strArray[4] == "T");
-                    }
-                    break;
+                if (OnIMIn != null)
+                {
+                    string strMsg = string.Join("", strArray, 8, strArray.Length - 8);
+                    OnIMIn(User.Normalize(strArray[2]), Regex.Replace(strMsg, @"<(.|\n)*?>", string.Empty), strArray[4] == "T");
+                }
+                break;
 
                 case "UPDATE_BUDDY2":
                     if (OnUpdateBuddy != null)
@@ -328,12 +353,19 @@ namespace dotTOC
                     }
                     break;
 
-                case "ERROR":
-                    if (OnTOCError != null)
-                    {
-                        OnTOCError(new TOCError { Code = strArray[2]});
-                    }
-                    break;
+                //case "ERROR":
+                //    if (OnTOCError != null)
+                //    {
+                //        if (strArray.Length > 4)
+                //        {
+                //            OnTOCError(new TOCError { Code = strArray[2], Argument = strArray[4] });
+                //        }
+                //        else
+                //        {
+                //            OnTOCError(new TOCError { Code = strArray[2] });
+                //        }
+                //    }
+                //    break;
 
                 case "CHAT_JOIN":
                     if (OnChatJoined != null)
@@ -558,6 +590,34 @@ namespace dotTOC
 
 		#endregion public_functions
 
+        #region TOC Messages Functions
 
+        [TOCCallback("ERROR")]
+        public void DoTOCError(string[] Params)
+        {
+            if (OnTOCError != null)
+            {
+                if (Params.Length > 4)
+                {
+                    OnTOCError(new TOCError { Code = Params[2], Argument = Params[4] });
+                }
+                else
+                {
+                    OnTOCError(new TOCError { Code = Params[2] });
+                }
+            }
+        }
+
+        [TOCCallback("IM_IN2")]
+        public void DoIMIn(string[] Params)
+        {
+            if (OnIMIn != null)
+            {
+                string strMsg = string.Join("", Params, 8, Params.Length - 8);
+                OnIMIn(User.Normalize(Params[2]), Regex.Replace(strMsg, @"<(.|\n)*?>", string.Empty), Params[4] == "T");
+            }
+        }
+
+        #endregion
     }
 }
