@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Threading;
+using System.Diagnostics;
 using dotTOC;
 using log4net;
 
@@ -24,31 +25,57 @@ namespace WindotTOC
         {
             log.Info("LoginForm created");
             InitializeComponent();
+
             _toc.OnSignedOn += new TOC.OnSignedOnHandler(_toc_OnSignedOn);
+            _toc.OnTOCError += new TOC.OnTOCErrorHandler(_toc_OnTOCError);
+            _toc.OnConfig += new TOC.OnConfigHandler(_toc_OnConfig);
+        }
+
+        void _toc_OnConfig(UserConfig config)
+        {
+            _blf.ProcessConfig(config);
+        }
+
+        delegate void OnErrorHandler(TOCError error);
+        void _toc_OnTOCError(TOCError error)
+        {
+            if (!InvokeRequired)
+            {
+                string strError = string.Empty;
+                switch (error.Code)
+                {
+                    case "980":
+                        strError += "Invalid login";
+                    break;
+
+                    default:
+                        strError += string.Format("Unknown error: {0}", error.Code);
+                    break;
+                }
+
+                errorLabel.Visible = true;
+                errorLabel.Text = strError;
+            }
+            else
+            {
+                Invoke(new OnErrorHandler(_toc_OnTOCError), new object[] { error });
+            }
         }
 
         void _toc_OnSignedOn()
         {
             log.Info("TOC Signed On");
 
-            //Thread t = new Thread(new ThreadStart(SignedOn));
-            //t.Start();
             HideForm();
-            _blf = new BuddyListForm(_toc);
-            _blf.FormClosed += new FormClosedEventHandler(bl_FormClosed);
+
+
             t = new Thread(new ThreadStart(SignedOn));
             t.Start();
-            //_blf.Show();
-            //HideForm();
         }
 
         private void SignedOn()
         {
             _blf.ShowDialog();
-            //_blf.Show();
-
-            //this.Hide();
-
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -58,7 +85,14 @@ namespace WindotTOC
                 try
                 {
                     log.InfoFormat("Connecting {0}", usernameTxt.Text);
+
+                    // initialize the buddy list form so it can receive callbacks
+                    _blf = new BuddyListForm(_toc);
+                    _blf.FormClosed += new FormClosedEventHandler(bl_FormClosed);
+
                     _toc.Connect(usernameTxt.Text, passwordTxt.Text);
+                    errorLabel.Visible = false;
+                    errorLabel.Text = string.Empty;
                 }
                 catch (Exception ex)
                 {
@@ -67,11 +101,17 @@ namespace WindotTOC
             }
         }
 
+        private delegate void FormClosedHandler(object sender, FormClosedEventArgs e);
         void bl_FormClosed(object sender, FormClosedEventArgs e)
         {
-            //throw new NotImplementedException();
-            //this.Close();
-            //Close();
+            if (InvokeRequired)
+            {
+                Invoke(new FormClosedHandler(bl_FormClosed), new object[] { sender, e });
+            }
+            else
+            {
+                this.Show();
+            }
         }
 
         private delegate void HideFormCallback();
@@ -97,6 +137,21 @@ namespace WindotTOC
             {
 
             }
+        }
+
+        private void LoginForm_Load(object sender, EventArgs e)
+        {
+            FileVersionInfo info = FileVersionInfo.GetVersionInfo("WindotTOC.exe");
+            versionLabel.Text += " "+info.FileMajorPart+"."+info.FileMinorPart;
+
+            linkLabel1.Links.Remove(linkLabel1.Links[0]);
+            linkLabel1.Links.Add(0, linkLabel1.Text.Length, @"http://code.google.com/p/dottoc/");  
+        }
+
+        private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            ProcessStartInfo sInfo = new ProcessStartInfo(e.Link.LinkData.ToString());
+            Process.Start(sInfo);
         }
     }
 }
