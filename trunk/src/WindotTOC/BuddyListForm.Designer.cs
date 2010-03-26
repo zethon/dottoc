@@ -34,7 +34,7 @@
             // buddyTree
             // 
             this.buddyTree.Location = new System.Drawing.Point(8, 15);
-            this.buddyTree.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.buddyTree.Margin = new System.Windows.Forms.Padding(4);
             this.buddyTree.Name = "buddyTree";
             this.buddyTree.Size = new System.Drawing.Size(255, 398);
             this.buddyTree.TabIndex = 0;
@@ -45,7 +45,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(268, 422);
             this.Controls.Add(this.buddyTree);
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "BuddyListForm";
             this.Text = "BuddyListForm";
             this.ResumeLayout(false);

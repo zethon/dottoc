@@ -40,41 +40,59 @@ namespace WindotTOC
         {
             if (!InvokeRequired)
             {
-                foreach (string strKey in _config.BuddyList.Keys)
+                TreeNode[] buddyNodes = buddyTree.Nodes.Find(buddy.Name, true);
+
+                if (buddyNodes.Count() > 0)
                 {
-                    List<Buddy> bl = _config.BuddyList[strKey];
-
-                    var q = from b in bl
-                            where b.NormalizedName == buddy.NormalizedName
-                            select b;
-
-                    if (q.Count() > 0)
+                    TreeNode currentNode = buddyNodes[0];
+                    if (!buddy.Online)
                     {
-                        Buddy foundBuddy = q.Single() as Buddy;
-                        if (foundBuddy != null)
-                        {
-                            TreeNode groupNode = null;
-                            foreach (TreeNode node in buddyTree.Nodes)
-                            {
-                                if (node.Text == strKey)
-                                {
-                                    groupNode = node;
-                                    break;
-                                }
-                            }
-
-                            if (groupNode == null)
-                            {
-                                groupNode = buddyTree.Nodes.Add(strKey);
-                            }
-
-                            groupNode.Nodes.Add(buddy.Name);
-                        }
-
-                        //this.Invalidate();
-                        break;
+                        currentNode.Remove();
                     }
-                }            
+                }
+                else if (buddy.Online)
+                {
+                    foreach (string strKey in _config.BuddyList.Keys)
+                    {
+                        List<Buddy> bl = _config.BuddyList[strKey];
+
+                        var q = from b in bl
+                                where b.NormalizedName == buddy.NormalizedName
+                                select b;
+
+                        if (q.Count() > 0)
+                        {
+                            Buddy foundBuddy = q.Single() as Buddy;
+                            if (foundBuddy != null)
+                            {
+                                TreeNode groupNode = null;
+                                foreach (TreeNode node in buddyTree.Nodes)
+                                {
+                                    if (node.Text == strKey)
+                                    {
+                                        groupNode = node;
+                                        break;
+                                    }
+                                }
+
+                                if (groupNode == null)
+                                {
+                                    TreeNode tempNode = new TreeNode { Name = strKey, Text = strKey};
+                                    Font f = new Font(buddyTree.Font, FontStyle.Bold);
+                                    tempNode.NodeFont = f;
+
+                                    buddyTree.Nodes.Add(tempNode);
+                                    groupNode = tempNode;
+                                }
+
+                                groupNode.Nodes.Add(buddy.NormalizedName,buddy.Name);
+                            }
+
+                            //this.Invalidate();
+                            break;
+                        }
+                    }
+                }
             }
             else
             {
