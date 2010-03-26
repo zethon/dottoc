@@ -14,7 +14,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Diagnostics;
 using System.Threading;
-using System.Collections;
+using System.Collections.Generic;
 using System.Timers;
 using System.Text.RegularExpressions;
 using System.Reflection;
@@ -84,6 +84,9 @@ namespace dotTOC
 		}
 
         #region delegates/callbacks
+        public delegate void OnConfigHandler(UserConfig config);
+        public event OnConfigHandler OnConfig;
+
         public delegate void OnTOCErrorHandler(TOCError error);
         public event OnTOCErrorHandler OnTOCError;
 
@@ -355,7 +358,6 @@ namespace dotTOC
 
         #endregion private_functions
 
-
 		#region server functions
 
         public void Connect(string strName, string strPW)
@@ -598,32 +600,72 @@ namespace dotTOC
         [TOCCallback("CONFIG2")]
         public void DoConfig(string[] Params)
         {
-            string strAll = string.Join(string.Empty, Params);
-
-            foreach (string strLine in strAll.Split('\n'))
+            if (OnConfig == null)
+                return;
+            try
             {
-                if (strLine.ToLower().Trim() == "done:")
-                {
-                    break;
-                }
+                UserConfig config = new UserConfig();
 
-                if (strLine.StartsWith("b"))
+                string strAll = string.Join(string.Empty, Params);
+                string[] Lines = strAll.Split('\n');
+                string strCurrentGroup = string.Empty;
+
+                foreach (string strLine in Lines)
                 {
+                    if (strLine.ToLower().Trim() == "done:")
+                    {
+                        break;
+                    }
+
                     string strTemp = strLine.Trim();
                     strTemp = strTemp.Remove(0, 2);
 
-                    Buddy buddy = new Buddy { Name = strTemp };
+                    if (strTemp.IndexOf(':') != -1)
+                    {
+                        int iTemp = strTemp.IndexOf(':');
+                        strTemp = strTemp.Remove(iTemp);
+                    }
 
-                }
-                else if (strLine.StartsWith("g"))
-                {
-                    string strTemp = strLine.Trim();
-                    strTemp = strTemp.Remove(0, 2);
-                }
-                else if (strLine.StartsWith("m"))
-                {
+                    if (strLine.StartsWith("m"))
+                    {
+                        int iMode = int.Parse(strTemp);
+                        config.Mode = (PermitDenyMode)Enum.ToObject(typeof(PermitDenyMode), (int)iMode);
+                    }
+                    else if (strLine.StartsWith("p"))
+                    {
+                        config.PermitList.Add(new Buddy { Name = strTemp });
+                    }
+                    else if (strLine.StartsWith("d"))
+                    {
+                        config.DenyList.Add(new Buddy { Name = strTemp });
+                    }
+                    else if (strLine.StartsWith("b"))
+                    {
+                        if (strCurrentGroup != string.Empty)
+                        {
+                            if (!config.BuddyList.ContainsKey(strCurrentGroup))
+                            {
+                                config.BuddyList.Add(strCurrentGroup, new List<Buddy>());
+                            }
 
+                            Buddy buddy = new Buddy { Name = strTemp };
+                            config.BuddyList[strCurrentGroup].Add(buddy);
+                        }
+                    }
+                    else if (strLine.StartsWith("g"))
+                    {
+                        if (strTemp != string.Empty)
+                        {
+                            strCurrentGroup = strTemp;
+                        }
+                    }
                 }
+
+                OnConfig(config);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(@"Invalid config sent from TOC", ex);
             }
         }
 
@@ -653,11 +695,14 @@ namespace dotTOC
                     Message = Regex.Replace(strMsg, @"<(.|\n)*?>", string.Empty),
                     Auto = Params[4] == "T"
                 };
-
                 OnIMIn(im);
             }
         }
 
+        /// <summary>
+        /// Callback for the TOC 'NICK' command that sends the format of the user's screen name
+        /// </summary>
+        /// <param name="Params"></param>
         [TOCCallback("NICK")]
         public void DoNick(string[] Params)
         {

@@ -33,6 +33,14 @@ namespace dotTOC
             get;
         }
 
+        public string NormalizedName
+        {
+            get
+            {
+                return User.Normalize(Name);
+            }
+        }
+
         // IComparable implementation
         public int CompareTo(object obj)
         {

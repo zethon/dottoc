@@ -28,22 +28,24 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.treeView1 = new System.Windows.Forms.TreeView();
+            this.buddyTree = new System.Windows.Forms.TreeView();
             this.SuspendLayout();
             // 
-            // treeView1
+            // buddyTree
             // 
-            this.treeView1.Location = new System.Drawing.Point(6, 12);
-            this.treeView1.Name = "treeView1";
-            this.treeView1.Size = new System.Drawing.Size(192, 324);
-            this.treeView1.TabIndex = 0;
+            this.buddyTree.Location = new System.Drawing.Point(8, 15);
+            this.buddyTree.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.buddyTree.Name = "buddyTree";
+            this.buddyTree.Size = new System.Drawing.Size(255, 398);
+            this.buddyTree.TabIndex = 0;
             // 
             // BuddyListForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(201, 343);
-            this.Controls.Add(this.treeView1);
+            this.ClientSize = new System.Drawing.Size(268, 422);
+            this.Controls.Add(this.buddyTree);
+            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Name = "BuddyListForm";
             this.Text = "BuddyListForm";
             this.ResumeLayout(false);
@@ -52,6 +54,6 @@
 
         #endregion
 
-        private System.Windows.Forms.TreeView treeView1;
+        private System.Windows.Forms.TreeView buddyTree;
     }
 }
