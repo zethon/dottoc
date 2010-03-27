@@ -16,6 +16,9 @@ namespace WindotTOC
     {
         static ILog log = LogManager.GetLogger(typeof(BuddyListForm));
 
+        public bool IsExiting = false;
+
+        // privates
         UserConfig _config;
         Dictionary<string, IMForm> _IMForms;
         TOC _toc = null;
@@ -27,21 +30,14 @@ namespace WindotTOC
 
             _toc = tocObj;
             _toc.OnIMIn += new TOC.OnIMInHandler(OnNewMessage);
-            _toc.OnUpdateBuddy += new TOC.OnUpdateBubbyHandler(_toc_OnUpdateBuddy);
-        }
-
-        void _toc_OnUpdateBuddy(Buddy buddy)
-        {
-            UpdateBuddy(buddy);
+            _toc.OnUpdateBuddy += new TOC.OnUpdateBubbyHandler(OnUpdateBuddy);
         }
 
         private delegate void UpdateBuddyHandler(Buddy buddy);
-        private void UpdateBuddy(Buddy buddy)
+        private void OnUpdateBuddy(Buddy buddy)
         {
             if (!InvokeRequired)
             {
-                //TreeNode[] buddyNodes = buddyTree.Nodes.Find(buddy.Name, true);
-
                 // search the buddlist. 
                 var q = from n in buddyTree.Nodes.Find(buddy.Name, true)
                         where n.Tag is Buddy && n.Name == buddy.NormalizedName 
@@ -95,15 +91,17 @@ namespace WindotTOC
                                 }
 
                                 if (groupNode == null)
-                                {
+                                { // group node not found, add it to the treeview
+
                                     TreeNode tempNode = new TreeNode 
                                     { 
                                         Name = strKey, 
                                         Text = strKey,
-                                        NodeFont = new Font(buddyTree.Font, FontStyle.Bold)
                                     };
 
                                     buddyTree.Nodes.Add(tempNode);
+                                    tempNode.Expand();
+
                                     groupNode = tempNode;
                                 }
 
@@ -112,7 +110,8 @@ namespace WindotTOC
                                 {
                                     Name = buddy.NormalizedName, 
                                     Text = buddy.Name, 
-                                    Tag = buddy 
+                                    Tag = buddy,
+                                    NodeFont = new Font(buddyTree.Font, FontStyle.Regular)
                                 });
                             }
 
@@ -123,7 +122,7 @@ namespace WindotTOC
             }
             else
             {
-                Invoke(new UpdateBuddyHandler(UpdateBuddy), new object[] { buddy } );
+                Invoke(new UpdateBuddyHandler(OnUpdateBuddy), new object[] { buddy } );
             }
         }
 
@@ -190,6 +189,52 @@ namespace WindotTOC
             if (frm != null)
             {
                 _IMForms.Remove(frm.Username);
+            }
+        }
+
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            IsExiting = true;
+            _toc.Disconnect();
+            Application.Exit();
+        }
+
+        private void logOffToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            _toc.Disconnect();
+            this.Hide();
+            this.Dispose();
+        }
+        
+        private void buddyTree_DoubleClick(object sender, EventArgs e)
+        {
+            TreeView tv = sender as TreeView;
+
+            if (tv == null)
+            {
+                log.Debug("Object not a TreeView!");
+                return;
+            }
+
+            TreeNode snode = tv.SelectedNode;
+            if (snode != null)
+            {
+                if (snode.Tag is Buddy)
+                {
+                    if (_IMForms.ContainsKey(snode.Name))
+                    {
+                        IMForm form = _IMForms[snode.Name];
+                        form.BringToFront();
+                    }
+                    else
+                    {
+                        IMForm nf = new IMForm(_toc, snode.Name);
+                        nf.FormClosed += new FormClosedEventHandler(OnIMFormClosed);
+
+                        _IMForms.Add(snode.Name, nf);
+                        nf.Show();
+                    }
+                }
             }
         }
     }

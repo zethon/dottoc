@@ -33,15 +33,17 @@
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.saveConversationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clearScrollbackToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.showTimestampsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.enableLoggingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.showTimestampsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // msgText
             // 
+            this.msgText.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.msgText.BackColor = System.Drawing.SystemColors.Window;
             this.msgText.Location = new System.Drawing.Point(9, 27);
             this.msgText.Multiline = true;
@@ -53,11 +55,13 @@
             // 
             // textBox1
             // 
+            this.textBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.textBox1.Location = new System.Drawing.Point(9, 220);
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(274, 41);
-            this.textBox1.TabIndex = 1;
+            this.textBox1.TabIndex = 0;
             this.textBox1.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textBox1_KeyPress);
             // 
             // menuStrip1
@@ -68,7 +72,7 @@
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(295, 24);
-            this.menuStrip1.TabIndex = 3;
+            this.menuStrip1.TabIndex = 1;
             this.menuStrip1.Text = "menuStrip1";
             // 
             // toolStripMenuItem1
@@ -77,14 +81,20 @@
             this.saveConversationToolStripMenuItem,
             this.clearScrollbackToolStripMenuItem});
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(35, 20);
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(37, 20);
             this.toolStripMenuItem1.Text = "&File";
             // 
             // saveConversationToolStripMenuItem
             // 
             this.saveConversationToolStripMenuItem.Name = "saveConversationToolStripMenuItem";
-            this.saveConversationToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
+            this.saveConversationToolStripMenuItem.Size = new System.Drawing.Size(171, 22);
             this.saveConversationToolStripMenuItem.Text = "&Save Conversation";
+            // 
+            // clearScrollbackToolStripMenuItem
+            // 
+            this.clearScrollbackToolStripMenuItem.Name = "clearScrollbackToolStripMenuItem";
+            this.clearScrollbackToolStripMenuItem.Size = new System.Drawing.Size(171, 22);
+            this.clearScrollbackToolStripMenuItem.Text = "&Clear Scrollback";
             // 
             // optionsToolStripMenuItem
             // 
@@ -92,26 +102,20 @@
             this.enableLoggingToolStripMenuItem,
             this.showTimestampsToolStripMenuItem});
             this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
-            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(56, 20);
+            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
             this.optionsToolStripMenuItem.Text = "&Options";
-            // 
-            // clearScrollbackToolStripMenuItem
-            // 
-            this.clearScrollbackToolStripMenuItem.Name = "clearScrollbackToolStripMenuItem";
-            this.clearScrollbackToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
-            this.clearScrollbackToolStripMenuItem.Text = "&Clear Scrollback";
-            // 
-            // showTimestampsToolStripMenuItem
-            // 
-            this.showTimestampsToolStripMenuItem.Name = "showTimestampsToolStripMenuItem";
-            this.showTimestampsToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
-            this.showTimestampsToolStripMenuItem.Text = "Show Timestamps";
             // 
             // enableLoggingToolStripMenuItem
             // 
             this.enableLoggingToolStripMenuItem.Name = "enableLoggingToolStripMenuItem";
-            this.enableLoggingToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
+            this.enableLoggingToolStripMenuItem.Size = new System.Drawing.Size(171, 22);
             this.enableLoggingToolStripMenuItem.Text = "Enable Logging";
+            // 
+            // showTimestampsToolStripMenuItem
+            // 
+            this.showTimestampsToolStripMenuItem.Name = "showTimestampsToolStripMenuItem";
+            this.showTimestampsToolStripMenuItem.Size = new System.Drawing.Size(171, 22);
+            this.showTimestampsToolStripMenuItem.Text = "Show Timestamps";
             // 
             // IMForm
             // 
