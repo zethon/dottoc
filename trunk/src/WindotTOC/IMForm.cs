@@ -25,6 +25,17 @@ namespace WindotTOC
         {
             InitializeComponent();
             _toc = toc;
+
+            this.Text = _strUsername;
+        }
+
+        public IMForm(TOC toc, string strToUser)
+        {
+            InitializeComponent();
+            _toc = toc;
+            _strUsername = strToUser;
+
+            this.Text = _strUsername;
         }
 
         delegate void NewIMMessageHandler(InstantMessage im);

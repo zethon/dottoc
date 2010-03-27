@@ -110,7 +110,10 @@ namespace WindotTOC
             }
             else
             {
-                this.Show();
+                if (!_blf.IsExiting)
+                {
+                    this.Show();
+                }
             }
         }
 
