@@ -7,9 +7,9 @@ namespace dotTOC
 {
     public class InstantMessage
     {
-        public string From;
-        public string To;
-        public string Message;
+        public string To = string.Empty;
+        public string From = string.Empty;
+        public string Message = string.Empty;
         public bool Auto = false;
     }
 }
