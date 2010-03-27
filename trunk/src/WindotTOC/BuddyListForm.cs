@@ -40,31 +40,50 @@ namespace WindotTOC
         {
             if (!InvokeRequired)
             {
-                TreeNode[] buddyNodes = buddyTree.Nodes.Find(buddy.Name, true);
+                //TreeNode[] buddyNodes = buddyTree.Nodes.Find(buddy.Name, true);
 
-                if (buddyNodes.Count() > 0)
+                // search the buddlist. 
+                var q = from n in buddyTree.Nodes.Find(buddy.Name, true)
+                        where n.Tag is Buddy && n.Name == buddy.NormalizedName 
+                        select n;
+
+                // the buddy exists on the list
+                if (q.Count() > 0)
                 {
-                    TreeNode currentNode = buddyNodes[0];
-                    if (!buddy.Online)
+                    foreach (TreeNode currentNode in q)
                     {
-                        currentNode.Remove();
+                        if (!buddy.Online)
+                        {
+                            currentNode.Remove();
+                        }
+                        else
+                        {
+                            // TODO: update the buddy's display on the treeview
+                            log.InfoFormat("Updating Buddy `{0}`", buddy.NormalizedName);
+                        }
                     }
                 }
                 else if (buddy.Online)
-                {
+                { // buddy is not on list and is now online
+
+                    // check the config to see if we have info about this buddy in the config
                     foreach (string strKey in _config.BuddyList.Keys)
                     {
                         List<Buddy> bl = _config.BuddyList[strKey];
 
-                        var q = from b in bl
+                        var q1 = from b in bl
                                 where b.NormalizedName == buddy.NormalizedName
                                 select b;
 
-                        if (q.Count() > 0)
+                        if (q1.Count() > 0)
                         {
-                            Buddy foundBuddy = q.Single() as Buddy;
-                            if (foundBuddy != null)
+                            // buddy can't be in the same group more than once
+                            Buddy configBuddyObj = q1.Single() as Buddy;
+
+                            //  unnecessary?
+                            if (configBuddyObj != null)
                             {
+                                // see if a node for the group exists in the treeview
                                 TreeNode groupNode = null;
                                 foreach (TreeNode node in buddyTree.Nodes)
                                 {
@@ -77,18 +96,26 @@ namespace WindotTOC
 
                                 if (groupNode == null)
                                 {
-                                    TreeNode tempNode = new TreeNode { Name = strKey, Text = strKey};
-                                    Font f = new Font(buddyTree.Font, FontStyle.Bold);
-                                    tempNode.NodeFont = f;
+                                    TreeNode tempNode = new TreeNode 
+                                    { 
+                                        Name = strKey, 
+                                        Text = strKey,
+                                        NodeFont = new Font(buddyTree.Font, FontStyle.Bold)
+                                    };
 
                                     buddyTree.Nodes.Add(tempNode);
                                     groupNode = tempNode;
                                 }
 
-                                groupNode.Nodes.Add(buddy.NormalizedName,buddy.Name);
+                                // add the buddy to the treeview node
+                                groupNode.Nodes.Add(new TreeNode 
+                                {
+                                    Name = buddy.NormalizedName, 
+                                    Text = buddy.Name, 
+                                    Tag = buddy 
+                                });
                             }
 
-                            //this.Invalidate();
                             break;
                         }
                     }
