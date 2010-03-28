@@ -24,7 +24,7 @@ namespace ConsoleAim
                 }
                 else
                 {
-                    log.Debug("Could not initialize application.");
+                    log.Warn("Could not initialize application.");
                 }
             }
             catch (Exception ex)
