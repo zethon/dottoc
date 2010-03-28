@@ -23,12 +23,13 @@ namespace WindotTOC
 
         public LoginForm()
         {
-            log.Info("LoginForm created");
             InitializeComponent();
 
             _toc.OnSignedOn += new TOC.OnSignedOnHandler(_toc_OnSignedOn);
             _toc.OnTOCError += new TOC.OnTOCErrorHandler(_toc_OnTOCError);
             _toc.OnConfig += new TOC.OnConfigHandler(_toc_OnConfig);
+
+            log.Debug("LoginForm created");
         }
 
         void _toc_OnConfig(UserConfig config)
@@ -55,6 +56,8 @@ namespace WindotTOC
 
                 errorLabel.Visible = true;
                 errorLabel.Text = strError;
+
+                log.ErrorFormat("TOC Error Code:{0} Argument:{1}", error.Code, error.Argument);
             }
             else
             {
@@ -96,7 +99,7 @@ namespace WindotTOC
                 }
                 catch (Exception ex)
                 {
-                    log.Debug("Could not connect", ex);
+                    log.Error("Could not connect", ex);
                 }
             }
         }

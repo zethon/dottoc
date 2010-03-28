@@ -44,11 +44,13 @@
                         | System.Windows.Forms.AnchorStyles.Right)));
             this.buddyTree.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.buddyTree.HideSelection = false;
-            this.buddyTree.Location = new System.Drawing.Point(4, 39);
+            this.buddyTree.Location = new System.Drawing.Point(5, 48);
+            this.buddyTree.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.buddyTree.Name = "buddyTree";
+            this.buddyTree.ShowLines = false;
             this.buddyTree.ShowPlusMinus = false;
             this.buddyTree.ShowRootLines = false;
-            this.buddyTree.Size = new System.Drawing.Size(201, 341);
+            this.buddyTree.Size = new System.Drawing.Size(267, 419);
             this.buddyTree.TabIndex = 0;
             this.buddyTree.DoubleClick += new System.EventHandler(this.buddyTree_DoubleClick);
             // 
@@ -58,7 +60,8 @@
             this.fileToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(210, 24);
+            this.menuStrip1.Padding = new System.Windows.Forms.Padding(8, 2, 0, 2);
+            this.menuStrip1.Size = new System.Drawing.Size(280, 28);
             this.menuStrip1.TabIndex = 1;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -69,36 +72,37 @@
             this.toolStripSeparator1,
             this.exitToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(58, 20);
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(70, 24);
             this.fileToolStripMenuItem.Text = "&Session";
             // 
             // logOffToolStripMenuItem
             // 
             this.logOffToolStripMenuItem.Name = "logOffToolStripMenuItem";
-            this.logOffToolStripMenuItem.Size = new System.Drawing.Size(114, 22);
+            this.logOffToolStripMenuItem.Size = new System.Drawing.Size(128, 24);
             this.logOffToolStripMenuItem.Text = "&Log Off";
             this.logOffToolStripMenuItem.Click += new System.EventHandler(this.logOffToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(111, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(125, 6);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(114, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(128, 24);
             this.exitToolStripMenuItem.Text = "E&xit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
             // BuddyListForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(210, 384);
+            this.ClientSize = new System.Drawing.Size(280, 473);
             this.Controls.Add(this.buddyTree);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
+            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Name = "BuddyListForm";
             this.Text = "BuddyListForm";
             this.menuStrip1.ResumeLayout(false);
