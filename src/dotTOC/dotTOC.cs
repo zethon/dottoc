@@ -476,7 +476,7 @@ namespace dotTOC
 			string strText;
 			
             strText = string.Format("toc2_send_im {0} \"{1}\"{2}",
-				User.Normalize(im.To),Encode(im.Message),
+				im.To.NormalizedName.ToString(),Encode(im.Message),
 				im.Auto ? " auto" : "");
 			
             Send(strText);

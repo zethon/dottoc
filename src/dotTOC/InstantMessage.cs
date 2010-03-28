@@ -7,9 +7,23 @@ namespace dotTOC
 {
     public class InstantMessage
     {
-        public string To = string.Empty;
-        public string From = string.Empty;
+        public Buddy To;
+
+        public Buddy From;
+        
         public string Message = string.Empty;
         public bool Auto = false;
+
+        public InstantMessage()
+        {
+
+        }
+
+        public InstantMessage(string from, string to, string message)
+        {
+            From = new Buddy { Name = from };
+            To = new Buddy { Name = to };
+            Message = message;
+        }
     }
 }
