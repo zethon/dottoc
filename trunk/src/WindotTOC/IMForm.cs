@@ -48,7 +48,7 @@ namespace WindotTOC
 
                 //int iSelectStart = msgText.Text.Length;
                 //int iSelectLength = im.From
-                msgText.Text += string.Format("{0}: {1}\r\n", im.From, im.Message);
+                msgText.Text += string.Format("{0}: {1}\r\n", im.From.Name, im.Message);
 
 
                 msgText.SelectionStart = msgText.Text.Length - 1;
@@ -63,7 +63,7 @@ namespace WindotTOC
         {
             if (e.KeyChar == (char)13)
             {
-                _toc.SendIM(new InstantMessage { To = _strUsername, Message = textBox1.Text });
+                _toc.SendIM(new InstantMessage { To = new Buddy { Name = _strUsername } , Message = textBox1.Text });
                 msgText.Text += string.Format("{0}: {1}\r\n", _toc.User.DisplayName, textBox1.Text);
                 textBox1.Text = string.Empty;
             }
