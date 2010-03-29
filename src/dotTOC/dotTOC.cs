@@ -691,7 +691,7 @@ namespace dotTOC
                 string strMsg = string.Join("", Params, 8, Params.Length - 8);
                 InstantMessage im = new InstantMessage
                 {
-                    From = Params[2],
+                    From = new Buddy { Name = Params[2] },
                     Message = Regex.Replace(strMsg, @"<(.|\n)*?>", string.Empty),
                     Auto = Params[4] == "T"
                 };

@@ -151,9 +151,9 @@ namespace WindotTOC
             {
                 log.InfoFormat("IMSG {0}:{1}", im.From, im.Message);
 
-                if (_IMForms.ContainsKey(im.From))
+                if (_IMForms.ContainsKey(im.From.Name))
                 {
-                    IMForm imf = _IMForms[im.From];
+                    IMForm imf = _IMForms[im.From.Name];
                     imf.NewIMMessage(im);
                 }
                 else
@@ -163,7 +163,7 @@ namespace WindotTOC
 
                     lock (_IMForms)
                     {
-                        _IMForms.Add(im.From, imf);
+                        _IMForms.Add(im.From.Name, imf);
                     }
 
                     imf.NewIMMessage(im);
