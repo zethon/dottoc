@@ -111,6 +111,12 @@
       <Name>dotTOC</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="images\group.png" />
+    <Content Include="images\idle.gif" />
+    <Content Include="images\online.png" />
+    <Content Include="images\unavailable.jpg" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

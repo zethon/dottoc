@@ -28,12 +28,15 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(BuddyListForm));
             this.buddyTree = new System.Windows.Forms.TreeView();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.logOffToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -44,9 +47,12 @@
                         | System.Windows.Forms.AnchorStyles.Right)));
             this.buddyTree.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.buddyTree.HideSelection = false;
+            this.buddyTree.ImageKey = "group";
+            this.buddyTree.ImageList = this.imageList1;
             this.buddyTree.Location = new System.Drawing.Point(5, 48);
-            this.buddyTree.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.buddyTree.Margin = new System.Windows.Forms.Padding(4);
             this.buddyTree.Name = "buddyTree";
+            this.buddyTree.SelectedImageKey = "group";
             this.buddyTree.ShowLines = false;
             this.buddyTree.ShowPlusMinus = false;
             this.buddyTree.ShowRootLines = false;
@@ -94,6 +100,15 @@
             this.exitToolStripMenuItem.Text = "E&xit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
+            // imageList1
+            // 
+            this.imageList1.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageList1.ImageStream")));
+            this.imageList1.TransparentColor = System.Drawing.Color.Transparent;
+            this.imageList1.Images.SetKeyName(0, "online");
+            this.imageList1.Images.SetKeyName(1, "unavailable");
+            this.imageList1.Images.SetKeyName(2, "group");
+            this.imageList1.Images.SetKeyName(3, "idle");
+            // 
             // BuddyListForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -102,7 +117,7 @@
             this.Controls.Add(this.buddyTree);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "BuddyListForm";
             this.Text = "BuddyListForm";
             this.menuStrip1.ResumeLayout(false);
@@ -120,5 +135,6 @@
         private System.Windows.Forms.ToolStripMenuItem logOffToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
+        private System.Windows.Forms.ImageList imageList1;
     }
 }

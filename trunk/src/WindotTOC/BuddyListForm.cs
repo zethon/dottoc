@@ -107,13 +107,29 @@ namespace WindotTOC
                                 groupNode = groupNodes[0];
                             }
 
+                            string strImageKey = @"online";
+                            FontStyle fs = FontStyle.Regular;
+
+                            if (buddy.MarkedUnavailable)
+                            {
+                                strImageKey = @"unavailable";
+                                fs = FontStyle.Strikeout;
+                            }
+                            else if (buddy.IdleTime > 0)
+                            {
+                                strImageKey = @"idle";
+                                fs = FontStyle.Italic;
+                            }
+
                             // add the buddy to the treeview node
                             groupNode.Nodes.Add(new TreeNode
                             {
                                 Name = buddy.NormalizedName,
                                 Text = buddy.Name,
                                 Tag = buddy,
-                                NodeFont = new Font(buddyTree.Font, FontStyle.Regular)
+                                NodeFont = new Font(buddyTree.Font, fs),
+                                ImageKey = strImageKey,
+                                SelectedImageKey = strImageKey
                             });
 
                             break;
