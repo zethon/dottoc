@@ -226,7 +226,7 @@ namespace ConsoleAim
             }
             else
             {
-                _toc.SendIM(new InstantMessage { To = strUsername, Message = strMessage });                
+                _toc.SendIM(new InstantMessage { To = new Buddy { Name = strUsername } , Message = strMessage });                
             }
 
         }
@@ -235,7 +235,7 @@ namespace ConsoleAim
         {
             lock (this)
             {
-                _strLastUser = im.From;
+                _strLastUser = im.From.Name;
                 ConsoleColor c = Console.ForegroundColor;
 
                 Console.ForegroundColor = ConsoleColor.DarkYellow;
@@ -265,7 +265,7 @@ namespace ConsoleAim
 
         void OnSendIM(InstantMessage im)
         {
-            _strLastUser = im.From;
+            _strLastUser = im.To.Name;
             ConsoleColor c = Console.ForegroundColor;
 
             Console.ForegroundColor = ConsoleColor.DarkYellow;
