@@ -109,16 +109,19 @@ namespace WindotTOC
 
                             string strImageKey = @"online";
                             FontStyle fs = FontStyle.Regular;
+                            Color fc = buddyTree.ForeColor;
 
                             if (buddy.MarkedUnavailable)
                             {
                                 strImageKey = @"unavailable";
-                                fs = FontStyle.Strikeout;
+                                fs = FontStyle.Italic;
+                                fc = Color.Gray;
                             }
                             else if (buddy.IdleTime > 0)
                             {
                                 strImageKey = @"idle";
                                 fs = FontStyle.Italic;
+                                fc = Color.Gray;
                             }
 
                             // add the buddy to the treeview node
@@ -129,7 +132,8 @@ namespace WindotTOC
                                 Tag = buddy,
                                 NodeFont = new Font(buddyTree.Font, fs),
                                 ImageKey = strImageKey,
-                                SelectedImageKey = strImageKey
+                                SelectedImageKey = strImageKey,
+                                ForeColor = fc
                             });
 
                             break;
@@ -165,7 +169,7 @@ namespace WindotTOC
         {
             if (!InvokeRequired)
             {
-                log.InfoFormat("IMSG {0}:{1}", im.From, im.Message);
+                log.InfoFormat("INMSG {0}:{1}", im.From.Name, im.Message);
 
                 if (_IMForms.ContainsKey(im.From.Name))
                 {
