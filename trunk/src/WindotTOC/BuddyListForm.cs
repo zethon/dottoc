@@ -38,8 +38,6 @@ namespace WindotTOC
         {
             if (!InvokeRequired)
             {
-                log.DebugFormat("Received TOC UPDATE_BUDDY2 for `{0}`", buddy.NormalizedName);
-
                 // search the buddlist. 
                 var q = from n in buddyTree.Nodes.Find(buddy.Name, true)
                         where n.Tag is Buddy && n.Name == buddy.NormalizedName 
@@ -60,12 +58,14 @@ namespace WindotTOC
                         {
                             // TODO: update the buddy's display on the treeview
                             log.DebugFormat("Updating Buddy `{0}`", buddy.NormalizedName);
+                            updateBuddyNode(buddy, currentNode);
                         }
                     }
                 }
                 else if (buddy.Online)
                 { // buddy is not on list and is now online
 
+                    bool bBuddyAdded = false;
                     log.DebugFormat("Buddy `{0}` is not in buddyTree but is Online", buddy.NormalizedName);
 
                     // check the config to see if we have info about this buddy in the config
@@ -107,38 +107,27 @@ namespace WindotTOC
                                 groupNode = groupNodes[0];
                             }
 
-                            string strImageKey = @"online";
-                            FontStyle fs = FontStyle.Regular;
-                            Color fc = buddyTree.ForeColor;
-
-                            if (buddy.MarkedUnavailable)
-                            {
-                                strImageKey = @"unavailable";
-                                fs = FontStyle.Italic;
-                                fc = Color.Gray;
-                            }
-                            else if (buddy.IdleTime > 0)
-                            {
-                                strImageKey = @"idle";
-                                fs = FontStyle.Italic;
-                                fc = Color.Gray;
-                            }
-
-                            // add the buddy to the treeview node
-                            groupNode.Nodes.Add(new TreeNode
+                            TreeNode newNode = new TreeNode
                             {
                                 Name = buddy.NormalizedName,
                                 Text = buddy.Name,
                                 Tag = buddy,
-                                NodeFont = new Font(buddyTree.Font, fs),
-                                ImageKey = strImageKey,
-                                SelectedImageKey = strImageKey,
-                                ForeColor = fc
-                            });
+                            };
 
+                            // add the buddy to the treeview node
+                            groupNode.Nodes.Add(newNode);
+                            updateBuddyNode(buddy, newNode);
+
+                            bBuddyAdded = true;
                             break;
                         }
                     }
+
+                    if (!bBuddyAdded)
+                    {
+                        log.DebugFormat("Buddy `{0}` is online but was not added to the buddyTree (doesn't exist in config?)",buddy.NormalizedName);
+                    }
+
                 }
                 else
                 {
@@ -169,25 +158,34 @@ namespace WindotTOC
         {
             if (!InvokeRequired)
             {
-                log.InfoFormat("INMSG {0}:{1}", im.From.Name, im.Message);
-
-                if (_IMForms.ContainsKey(im.From.Name))
+                try
                 {
-                    IMForm imf = _IMForms[im.From.Name];
-                    imf.NewIMMessage(im);
-                }
-                else
-                {
-                    IMForm imf = new IMForm(_toc);
-                    imf.FormClosed += new FormClosedEventHandler(OnIMFormClosed);
-
-                    lock (_IMForms)
+                    if (_IMForms.ContainsKey(im.From.Name))
                     {
-                        _IMForms.Add(im.From.Name, imf);
-                    }
+                        log.DebugFormat("Message window from `{0}` exists", im.From.Name);
 
-                    imf.NewIMMessage(im);
-                    imf.Show();
+                        IMForm imf = _IMForms[im.From.Name];
+                        imf.NewIMMessage(im);
+                    }
+                    else
+                    {
+                        log.DebugFormat("Creating message window from `{0}`", im.From.Name);
+
+                        IMForm imf = new IMForm(_toc);
+                        imf.FormClosed += new FormClosedEventHandler(OnIMFormClosed);
+
+                        lock (_IMForms)
+                        {
+                            _IMForms.Add(im.From.Name, imf);
+                        }
+
+                        imf.NewIMMessage(im);
+                        imf.Show();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    log.WarnFormat("Could not handle incoming IM", ex);
                 }
             }
             else
@@ -202,6 +200,7 @@ namespace WindotTOC
 
             if (frm != null)
             {
+                log.DebugFormat("Closing IMForm for `{0}`", frm.Username);
                 _IMForms.Remove(frm.Username);
             }
         }
@@ -250,6 +249,34 @@ namespace WindotTOC
                     }
                 }
             }
+        }
+
+        private void updateBuddyNode(Buddy buddy, TreeNode node)
+        {
+            string strNewImageKey = @"online";
+            FontStyle fs = FontStyle.Regular;
+            Color fc = buddyTree.ForeColor;
+
+            if (buddy.MarkedUnavailable)
+            {
+                strNewImageKey = @"unavailable";
+                fs = FontStyle.Italic;
+                fc = Color.Gray;
+            }
+            else if (buddy.IdleTime > 0)
+            {
+                strNewImageKey = @"idle";
+                fs = FontStyle.Italic;
+                fc = Color.Gray;
+            }
+            else if (buddy.Class == OscarClass.Wireless)
+            {
+                strNewImageKey = @"mobile";
+            }
+
+            node.ImageKey = node.SelectedImageKey = strNewImageKey;
+            node.NodeFont = new Font(buddyTree.Font, fs);
+            node.ForeColor = fc;
         }
     }
 }

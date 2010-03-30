@@ -114,6 +114,9 @@ namespace dotTOC
 		public delegate void OnServerMessageHandler(string strIncoming);
 		public event OnServerMessageHandler OnServerMessage;
 
+        public delegate void OnSendServerMessageHandler(string Outgoing);
+        public event OnSendServerMessageHandler OnSendServerMessage;
+
 		public delegate void OnChatJoinedHandler(string strRoomID, string strRoomName);
 		public event OnChatJoinedHandler OnChatJoined;
         #endregion
@@ -458,6 +461,11 @@ namespace dotTOC
             if (TOCSocket != null && TOCSocket.Connected)
             {
                 TOCSocket.Send(packet, msgLen + 6, 0);
+
+                if (OnSendServerMessage != null)
+                {
+                    OnSendServerMessage(szMsg);
+                }
             }
         }
 
@@ -692,7 +700,7 @@ namespace dotTOC
                 InstantMessage im = new InstantMessage
                 {
                     From = new Buddy { Name = Params[2] },
-                    Message = Regex.Replace(strMsg, @"<(.|\n)*?>", string.Empty),
+                    RawMessage = strMsg,
                     Auto = Params[4] == "T"
                 };
                 OnIMIn(im);

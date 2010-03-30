@@ -108,6 +108,7 @@
             this.imageList1.Images.SetKeyName(1, "unavailable");
             this.imageList1.Images.SetKeyName(2, "group");
             this.imageList1.Images.SetKeyName(3, "idle");
+            this.imageList1.Images.SetKeyName(4, "mobile");
             // 
             // BuddyListForm
             // 

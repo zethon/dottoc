@@ -114,6 +114,7 @@
   <ItemGroup>
     <Content Include="images\group.png" />
     <Content Include="images\idle.gif" />
+    <Content Include="images\mobile.png" />
     <Content Include="images\online.png" />
     <Content Include="images\unavailable.jpg" />
   </ItemGroup>
