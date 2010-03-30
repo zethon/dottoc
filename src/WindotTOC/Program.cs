@@ -13,6 +13,17 @@ namespace WindotTOC
     {
         static ILog log = LogManager.GetLogger(typeof(Program));
 
+        public static void AbortProgram()
+        {
+            log.Fatal("Aborting program");
+
+#if (DEBUG)
+            Console.ReadLine();
+#endif
+
+            Application.Exit();
+        }
+
 #if (DEBUG)
         [DllImport("kernel32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
@@ -33,7 +44,16 @@ namespace WindotTOC
 #if (DEBUG)
             AllocConsole();
 #endif
-            log4net.Config.XmlConfigurator.Configure();
+            try
+            {
+                log4net.Config.XmlConfigurator.Configure();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Could not load log4net");
+                Console.WriteLine("Error: {0}\r\n{1}", ex.Message, ex.StackTrace);
+                Program.AbortProgram();
+            }
 
             FileVersionInfo info = FileVersionInfo.GetVersionInfo("WindotTOC.exe");
             log.InfoFormat("Starting WindotTOC {0}", info.FileVersion);
