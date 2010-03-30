@@ -197,7 +197,7 @@ namespace ConsoleAim
         {
             if (_strLastUser != string.Empty && _toc.Connected)
             {
-                _toc.SendIM(new InstantMessage { From = new Buddy { Name = _strLastUser }, Message = strMessage });
+                _toc.SendIM(new InstantMessage { From = new Buddy { Name = _strLastUser }, RawMessage = strMessage });
             }
         }
 
@@ -226,7 +226,7 @@ namespace ConsoleAim
             }
             else
             {
-                _toc.SendIM(new InstantMessage { To = new Buddy { Name = strUsername } , Message = strMessage });                
+                _toc.SendIM(new InstantMessage { To = new Buddy { Name = strUsername }, RawMessage = strMessage });                
             }
 
         }

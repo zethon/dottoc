@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace dotTOC
 {
@@ -10,8 +11,14 @@ namespace dotTOC
         public Buddy To;
 
         public Buddy From;
-        
-        public string Message = string.Empty;
+
+        public string RawMessage = string.Empty;
+
+        public string Message
+        {
+            get { return Regex.Replace(RawMessage, @"<(.|\n)*?>", string.Empty); }
+        }
+
         public bool Auto = false;
 
         public InstantMessage()
@@ -23,7 +30,7 @@ namespace dotTOC
         {
             From = new Buddy { Name = from };
             To = new Buddy { Name = to };
-            Message = message;
+            RawMessage = message;
         }
     }
 }

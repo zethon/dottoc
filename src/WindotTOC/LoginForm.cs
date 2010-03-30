@@ -29,7 +29,20 @@ namespace WindotTOC
             _toc.OnTOCError += new TOC.OnTOCErrorHandler(_toc_OnTOCError);
             _toc.OnConfig += new TOC.OnConfigHandler(_toc_OnConfig);
 
+            _toc.OnServerMessage += new TOC.OnServerMessageHandler(_toc_OnServerMessage);
+            _toc.OnSendServerMessage += new TOC.OnSendServerMessageHandler(_toc_OnSendServerMessage);
+            
             log.Debug("LoginForm created");
+        }
+
+        void _toc_OnSendServerMessage(string Outgoing)
+        {
+            log.InfoFormat("<< {0}", Outgoing);
+        }
+
+        void _toc_OnServerMessage(string strIncoming)
+        {
+            log.InfoFormat(">> {0}", strIncoming);
         }
 
         void _toc_OnConfig(UserConfig config)
