@@ -51,7 +51,7 @@ namespace WindotTOC
                 _strUsername = im.From.Name;
                 this.Text = _strUsername;
 
-                editor1.DocumentText += string.Format("<b><font color=\"red\">{0}</font></b>: {1}<br/>", im.From.Name, im.RawMessage);
+                editor1.DocumentText += string.Format("<b><font color=\"#CC0000\">{0}</font></b>: {1}<br/>", im.From.Name, im.RawMessage);
             }
             else
             {
@@ -67,7 +67,8 @@ namespace WindotTOC
                 _toc.SendIM(new InstantMessage { To = new Buddy { Name = _strUsername }, RawMessage = textBox1.Text });
 
                 // add message to text box
-                editor1.DocumentText += string.Format("<b><font color=\"blue\">{0}</font></b>: {1}<br/>", _toc.User.DisplayName, textBox1.Text);
+                editor1.DocumentText += string.Format("<b><font color=\"#204A9D\">{0}</font></b>: {1}<br/>", _toc.User.DisplayName, textBox1.Text);
+                editor1.Document.Body.ScrollIntoView(false);
 
                 // reset the input box
                 textBox1.Text = string.Empty;
