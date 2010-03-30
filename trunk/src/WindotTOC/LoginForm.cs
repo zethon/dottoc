@@ -32,17 +32,17 @@ namespace WindotTOC
             _toc.OnServerMessage += new TOC.OnServerMessageHandler(_toc_OnServerMessage);
             _toc.OnSendServerMessage += new TOC.OnSendServerMessageHandler(_toc_OnSendServerMessage);
             
-            log.Debug("LoginForm created");
+            log.Info("LoginForm created");
         }
 
         void _toc_OnSendServerMessage(string Outgoing)
         {
-            log.InfoFormat("<< {0}", Outgoing);
+            log.DebugFormat("<< {0}", Outgoing);
         }
 
         void _toc_OnServerMessage(string strIncoming)
         {
-            log.InfoFormat(">> {0}", strIncoming);
+            log.DebugFormat(">> {0}", strIncoming);
         }
 
         void _toc_OnConfig(UserConfig config)
