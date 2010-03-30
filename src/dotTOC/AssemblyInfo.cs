@@ -1,3 +1,19 @@
+/* SVN FILE: $Id$ */
+/**
+* Project Name : Project Description
+*
+* @package className
+* @subpackage subclassName
+* @author $Author$
+* @copyright $Copyright$
+* @version $Revision$
+* @lastrevision $Date$
+* @modifiedby $LastChangedBy$
+* @lastmodified $LastChangedDate$
+* @license $License$
+* @filesource $URL$
+*/
+
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
@@ -6,8 +22,8 @@ using System.Runtime.CompilerServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 //
-[assembly: AssemblyTitle("")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("dotTOC")]
+[assembly: AssemblyDescription(".NET Libarary for AOL's TOC Protocol")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("")]
@@ -26,7 +42,7 @@ using System.Runtime.CompilerServices;
 // You can specify all the values or you can default the Revision and Build Numbers 
 // by using the '*' as shown below:
 
-[assembly: AssemblyVersion("1.0.*")]
+[assembly: AssemblyVersion("0.0.1.1")]
 
 //
 // In order to sign your assembly you must specify a key to use. Refer to the 
