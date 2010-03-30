@@ -30,6 +30,7 @@ namespace WindotTOC
             _toc = toc;
 
             this.Text = _strUsername;
+            editor1.ReadOnly = true;
         }
 
         public IMForm(TOC toc, string strToUser)
@@ -39,6 +40,7 @@ namespace WindotTOC
             _strUsername = strToUser;
 
             this.Text = _strUsername;
+            editor1.ReadOnly = true;
         }
 
         delegate void NewIMMessageHandler(InstantMessage im);
@@ -49,22 +51,7 @@ namespace WindotTOC
                 _strUsername = im.From.Name;
                 this.Text = _strUsername;
 
-                int iSelectStart = msgText.Text.Length;
-
-                // append the message
-                msgText.Text += string.Format("{0}: {1}\r\n", im.From.Name, im.Message);
-
-                // add the username
-                msgText.SelectionStart = iSelectStart;
-                msgText.SelectionLength = im.From.Name.Length;
-                msgText.SelectionColor = Color.DarkRed;
-                msgText.SelectionFont = new Font(msgText.Font, FontStyle.Bold);
-
-                // color the message
-                msgText.SelectionStart = iSelectStart + im.From.Name.Length + 1;
-                msgText.SelectionLength = im.Message.Length + 1;
-                msgText.SelectionColor = Color.Black;
-                msgText.SelectionFont = new Font(msgText.Font, FontStyle.Regular);
+                editor1.DocumentText += string.Format("<b><font color=\"red\">{0}</font></b>: {1}<br/>", im.From.Name, im.RawMessage);
             }
             else
             {
@@ -80,21 +67,7 @@ namespace WindotTOC
                 _toc.SendIM(new InstantMessage { To = new Buddy { Name = _strUsername }, RawMessage = textBox1.Text });
 
                 // add message to text box
-                int iSelectionStart = msgText.Text.Length;
-                msgText.Text += string.Format("{0}: {1}\r\n", _toc.User.DisplayName, textBox1.Text);
-
-                // color the username
-                msgText.SelectionStart = iSelectionStart;
-                msgText.SelectionLength = _toc.User.DisplayName.Length;
-                msgText.SelectionColor = Color.DarkBlue;
-                msgText.SelectionFont = new Font(msgText.Font, FontStyle.Bold);
-
-                // color the message
-                msgText.SelectionStart = iSelectionStart + _toc.User.DisplayName.Length;
-                msgText.SelectionLength = textBox1.Text.Length;
-                msgText.SelectionColor = Color.Black;
-                msgText.SelectionFont = new Font(msgText.Font, FontStyle.Regular);
-
+                editor1.DocumentText += string.Format("<b><font color=\"blue\">{0}</font></b>: {1}<br/>", _toc.User.DisplayName, textBox1.Text);
 
                 // reset the input box
                 textBox1.Text = string.Empty;

@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(IMForm));
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
@@ -36,7 +37,7 @@
             this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.enableLoggingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.showTimestampsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.msgText = new System.Windows.Forms.RichTextBox();
+            this.editor1 = new Design.Editor();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -44,11 +45,10 @@
             // 
             this.textBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox1.Location = new System.Drawing.Point(12, 339);
-            this.textBox1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.textBox1.Location = new System.Drawing.Point(9, 293);
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(572, 50);
+            this.textBox1.Size = new System.Drawing.Size(339, 41);
             this.textBox1.TabIndex = 0;
             this.textBox1.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textBox1_KeyPress);
             // 
@@ -59,8 +59,7 @@
             this.optionsToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Padding = new System.Windows.Forms.Padding(8, 2, 0, 2);
-            this.menuStrip1.Size = new System.Drawing.Size(601, 28);
+            this.menuStrip1.Size = new System.Drawing.Size(360, 24);
             this.menuStrip1.TabIndex = 1;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -70,19 +69,19 @@
             this.saveConversationToolStripMenuItem,
             this.clearScrollbackToolStripMenuItem});
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(44, 24);
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(37, 20);
             this.toolStripMenuItem1.Text = "&File";
             // 
             // saveConversationToolStripMenuItem
             // 
             this.saveConversationToolStripMenuItem.Name = "saveConversationToolStripMenuItem";
-            this.saveConversationToolStripMenuItem.Size = new System.Drawing.Size(199, 24);
+            this.saveConversationToolStripMenuItem.Size = new System.Drawing.Size(171, 22);
             this.saveConversationToolStripMenuItem.Text = "&Save Conversation";
             // 
             // clearScrollbackToolStripMenuItem
             // 
             this.clearScrollbackToolStripMenuItem.Name = "clearScrollbackToolStripMenuItem";
-            this.clearScrollbackToolStripMenuItem.Size = new System.Drawing.Size(199, 24);
+            this.clearScrollbackToolStripMenuItem.Size = new System.Drawing.Size(171, 22);
             this.clearScrollbackToolStripMenuItem.Text = "&Clear Scrollback";
             // 
             // optionsToolStripMenuItem
@@ -91,45 +90,47 @@
             this.enableLoggingToolStripMenuItem,
             this.showTimestampsToolStripMenuItem});
             this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
-            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(73, 24);
+            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
             this.optionsToolStripMenuItem.Text = "&Options";
             // 
             // enableLoggingToolStripMenuItem
             // 
             this.enableLoggingToolStripMenuItem.Name = "enableLoggingToolStripMenuItem";
-            this.enableLoggingToolStripMenuItem.Size = new System.Drawing.Size(198, 24);
+            this.enableLoggingToolStripMenuItem.Size = new System.Drawing.Size(171, 22);
             this.enableLoggingToolStripMenuItem.Text = "Enable Logging";
             // 
             // showTimestampsToolStripMenuItem
             // 
             this.showTimestampsToolStripMenuItem.Name = "showTimestampsToolStripMenuItem";
-            this.showTimestampsToolStripMenuItem.Size = new System.Drawing.Size(198, 24);
+            this.showTimestampsToolStripMenuItem.Size = new System.Drawing.Size(171, 22);
             this.showTimestampsToolStripMenuItem.Text = "Show Timestamps";
             // 
-            // msgText
+            // editor1
             // 
-            this.msgText.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            this.editor1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
                         | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
-            this.msgText.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.msgText.Location = new System.Drawing.Point(13, 33);
-            this.msgText.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
-            this.msgText.Name = "msgText";
-            this.msgText.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-            this.msgText.Size = new System.Drawing.Size(571, 298);
-            this.msgText.TabIndex = 2;
-            this.msgText.Text = "";
+            this.editor1.BodyHtml = null;
+            this.editor1.BodyText = null;
+            this.editor1.DocumentText = resources.GetString("editor1.DocumentText");
+            this.editor1.EditorBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.editor1.EditorForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
+            this.editor1.FontSize = Design.FontSize.Three;
+            this.editor1.Location = new System.Drawing.Point(12, 28);
+            this.editor1.Name = "editor1";
+            this.editor1.ReadOnly = true;
+            this.editor1.Size = new System.Drawing.Size(336, 259);
+            this.editor1.TabIndex = 3;
             // 
             // IMForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(601, 405);
-            this.Controls.Add(this.msgText);
+            this.ClientSize = new System.Drawing.Size(360, 347);
+            this.Controls.Add(this.editor1);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Name = "IMForm";
             this.Text = "IMForm";
             this.menuStrip1.ResumeLayout(false);
@@ -149,6 +150,6 @@
         private System.Windows.Forms.ToolStripMenuItem optionsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem enableLoggingToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem showTimestampsToolStripMenuItem;
-        private System.Windows.Forms.RichTextBox msgText;
+        private Design.Editor editor1;
     }
 }

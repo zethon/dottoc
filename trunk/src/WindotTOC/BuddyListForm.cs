@@ -208,7 +208,7 @@ namespace WindotTOC
                 }
                 catch (Exception ex)
                 {
-                    log.WarnFormat("Could not handle incoming IM", ex);
+                    log.Warn("Could not handle incoming IM", ex);
                 }
             }
             else
