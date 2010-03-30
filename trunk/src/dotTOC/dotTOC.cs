@@ -1,12 +1,6 @@
-/* SVN FILE: $Header$ */
-/**
-* dotTOC : .NET Library for AOL's TOC Protocol
-*
-* @version $Revision$
-* @lastrevision $Date$
-* @modifiedby $LastChangedBy$
-* @lastmodified $LastChangedDate$
-*/
+// @author $Author$
+// @version $Revision$
+// @lastrevision $Date$
 
 using System;
 using System.Text;

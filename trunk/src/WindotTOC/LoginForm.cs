@@ -31,8 +31,38 @@ namespace WindotTOC
 
             _toc.OnServerMessage += new TOC.OnServerMessageHandler(_toc_OnServerMessage);
             _toc.OnSendServerMessage += new TOC.OnSendServerMessageHandler(_toc_OnSendServerMessage);
-            
+
             log.Info("LoginForm created");
+        }
+
+        private void LoginForm_Load(object sender, EventArgs e)
+        {
+            try
+            {
+                FileVersionInfo info = FileVersionInfo.GetVersionInfo("WindotTOC.exe");
+                versionLabel.Text += " " + info.FileMajorPart + "." + info.FileMinorPart;
+
+                linkLabel1.Links.Remove(linkLabel1.Links[0]);
+                linkLabel1.Links.Add(0, linkLabel1.Text.Length, @"http://code.google.com/p/dottoc/");
+
+                log.Info("LoginForm loaded");
+            }
+            catch (Exception ex)
+            {
+                log.Fatal("Could not load LoginForm", ex);
+                Program.AbortProgram();                
+            }
+        }
+
+        private void LoginForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (!Properties.Settings.Default.RememberUser)
+            {
+                usernameTxt.Text = string.Empty;
+            }
+
+            Properties.Settings.Default.Save();
+            log.Info("LoginForm closing and defaults saved");
         }
 
         void _toc_OnSendServerMessage(string Outgoing)
@@ -164,19 +194,14 @@ namespace WindotTOC
             }
         }
 
-        private void LoginForm_Load(object sender, EventArgs e)
-        {
-            FileVersionInfo info = FileVersionInfo.GetVersionInfo("WindotTOC.exe");
-            versionLabel.Text += " "+info.FileMajorPart+"."+info.FileMinorPart;
 
-            linkLabel1.Links.Remove(linkLabel1.Links[0]);
-            linkLabel1.Links.Add(0, linkLabel1.Text.Length, @"http://code.google.com/p/dottoc/");  
-        }
 
         private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             ProcessStartInfo sInfo = new ProcessStartInfo(e.Link.LinkData.ToString());
             Process.Start(sInfo);
         }
+
+
     }
 }

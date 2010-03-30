@@ -52,6 +52,8 @@ namespace WindotTOC
                 this.Text = _strUsername;
 
                 editor1.DocumentText += string.Format("<b><font color=\"#CC0000\">{0}</font></b>: {1}<br/>", im.From.Name, im.RawMessage);
+
+                // TODO: scroll the window
             }
             else
             {
@@ -68,7 +70,8 @@ namespace WindotTOC
 
                 // add message to text box
                 editor1.DocumentText += string.Format("<b><font color=\"#204A9D\">{0}</font></b>: {1}<br/>", _toc.User.DisplayName, textBox1.Text);
-                editor1.Document.Body.ScrollIntoView(false);
+
+                // TODO: scroll the window
 
                 // reset the input box
                 textBox1.Text = string.Empty;
