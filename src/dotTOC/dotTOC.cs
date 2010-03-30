@@ -40,7 +40,7 @@ namespace dotTOC
         struct flap_header
         {
             public char asterisk;
-            public byte frametype;
+            public FLAPTYPE flaptype;
             public short datalen;
         };
 
@@ -232,10 +232,10 @@ namespace dotTOC
 			return retVal;
 		}
 
-		private void SetupRecieveCallback (Socket sock)
+		private void SetupRecieveCallback(Socket sock)
 		{
 		    AsyncCallback recieveData = new AsyncCallback(OnRecievedData);
-		    sock.BeginReceive(m_byBuff, 0, m_byBuff.Length, SocketFlags.None,recieveData, sock);
+		    sock.BeginReceive(m_byBuff,0,m_byBuff.Length,SocketFlags.None,recieveData,sock);
         }
 
         private void OnConnect(IAsyncResult ar)
@@ -281,19 +281,19 @@ namespace dotTOC
                     {
                         flap_header fh = new flap_header();
                         fh.asterisk = (char)m_byBuff[nBytesRead + 0];
-                        fh.frametype = (byte)m_byBuff[nBytesRead + 1];
+                        fh.flaptype = (FLAPTYPE)Enum.ToObject(typeof(FLAPTYPE), (byte)m_byBuff[nBytesRead + 1]);
 
                         byte[] byteTemp = { m_byBuff[nBytesRead + 5], m_byBuff[nBytesRead + 4] };
                         fh.datalen = BitConverter.ToInt16(byteTemp, 0);
 
-                        switch (fh.frametype)
+                        switch (fh.flaptype)
                         {
-                            case ((byte)FLAPTYPE.FT_SIGNON):
+                            case (FLAPTYPE.FT_SIGNON):
                                 SendFlapSignOn();
                                 SendUserSignOn();
                                 break;
 
-                            case ((byte)FLAPTYPE.FT_DATA):
+                            case (FLAPTYPE.FT_DATA):
                                 string sRecieved = Encoding.ASCII.GetString(m_byBuff, nBytesRead + 6, fh.datalen);
                                 Dispatch(sRecieved);
                                 break;
@@ -495,33 +495,6 @@ namespace dotTOC
             }
 		}
 
-
-
-
-
-        //public void AddBuddies(string [] strBuddies)
-        //{
-        //    // TODO: add a 'toc2_del_group test' command to reset the group?
-        //    string strCommand = "g:test\n";
-        //    foreach (string strName in strBuddies)
-        //    {
-        //        string strTemp = strCommand + "b:"+strName+"\n";
-
-        //        if (strTemp.Length >= 2048)
-        //        {
-        //            strCommand = "toc2_new_buddies {"+strCommand+"}";
-        //            Send(strCommand);
-        //            Thread.Sleep(150);
-        //            strCommand = "toc2_new_buddies g:test\n";
-        //        }
-        //        else
-        //            strCommand += "b:"+strName+"\n";
-        //    }
-
-        //    strCommand = "toc2_new_buddies {"+strCommand+"}";
-        //    Send(strCommand);
-        //}
-
         /// <summary>
         /// Sets user's away status as having returned
         /// </summary>
@@ -538,35 +511,6 @@ namespace dotTOC
         {
             Send(string.Format("toc_set_away \"{0}\"",Encode(Awaymessage)));
         }
-
-        //public string[] GetConfigBuddies(string strConfig)
-        //{
-        //    ArrayList names = new ArrayList();
-
-        //    foreach (string strLine in strConfig.Split('\n'))
-        //    {
-        //        if (strLine.ToLower().Trim() == "done:")
-        //            break;
-
-        //        if (strLine.StartsWith("b"))
-        //        {
-        //            string strTemp = strLine.Replace("\r", null);
-        //            int i = strTemp.IndexOf(":", 0);
-        //            strTemp = strTemp.Remove(0, i + 1);
-
-        //            i = strTemp.IndexOf(":", 0);
-        //            strTemp = strTemp.Remove(i, strTemp.Length - (i - 1));
-
-        //            names.Add(User.Normalize(strTemp));
-        //        }
-
-        //    }
-
-        //    return (string[])names.ToArray(typeof(string));
-        //}
-
-
-
 		#endregion public_functions
 
         #region TOC Server Messages
