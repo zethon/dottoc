@@ -86,7 +86,9 @@ namespace WindotTOC
 
 
             t = new Thread(new ThreadStart(SignedOn));
+            t.SetApartmentState(ApartmentState.STA);
             t.Start();
+            //t.Join();
         }
 
         private void SignedOn()
