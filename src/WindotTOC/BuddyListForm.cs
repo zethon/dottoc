@@ -46,18 +46,18 @@ namespace WindotTOC
                 // the buddy exists on the treeview
                 if (q.Count() > 0)
                 {
-                    log.DebugFormat("Buddy `{0}` exists in buddyTree", buddy.NormalizedName);
+                    log.InfoFormat("Buddy `{0}` exists in buddyTree", buddy.NormalizedName);
                     foreach (TreeNode currentNode in q)
                     {
                         if (!buddy.Online)
                         {
-                            log.DebugFormat("Removing buddy `{0}`", buddy.NormalizedName);
+                            log.InfoFormat("Removing buddy `{0}`", buddy.NormalizedName);
                             currentNode.Remove();
                         }
                         else
                         {
                             // TODO: update the buddy's display on the treeview
-                            log.DebugFormat("Updating Buddy `{0}`", buddy.NormalizedName);
+                            log.InfoFormat("Updating Buddy `{0}`", buddy.NormalizedName);
                             updateBuddyNode(buddy, currentNode);
                         }
                     }
@@ -66,7 +66,7 @@ namespace WindotTOC
                 { // buddy is not on list and is now online
 
                     bool bBuddyAdded = false;
-                    log.DebugFormat("Buddy `{0}` is not in buddyTree but is Online", buddy.NormalizedName);
+                    log.InfoFormat("Buddy `{0}` is not in buddyTree but is Online", buddy.NormalizedName);
 
                     // check the config to see if we have info about this buddy in the config
                     foreach (string strKey in _config.BuddyList.Keys)
@@ -79,7 +79,7 @@ namespace WindotTOC
 
                         if (q1.Count() > 0)
                         {
-                            log.DebugFormat("Buddy `{0}` exists in config in group `{1}`", buddy.NormalizedName, strKey);
+                            log.InfoFormat("Buddy `{0}` exists in config in group `{1}`", buddy.NormalizedName, strKey);
 
                             // buddy can't be in the same group more than once
                             Buddy configBuddyObj = q1.Single() as Buddy;
@@ -125,13 +125,36 @@ namespace WindotTOC
 
                     if (!bBuddyAdded)
                     {
-                        log.DebugFormat("Buddy `{0}` is online but was not added to the buddyTree (doesn't exist in config?)",buddy.NormalizedName);
-                    }
+                        log.InfoFormat("Buddy `{0}` not in config but online. Adding to Recent Buddies.)", buddy.NormalizedName);
 
+                        TreeNode[] rb = buddyTree.Nodes.Find(@"Recent Buddies", false);
+                        TreeNode groupNode = null;
+
+                        if (rb.Count() == 0)
+                        {
+                            TreeNode tempNode = new TreeNode { Name = @"Recent Buddies", Text = @"Recent Buddies" };
+                            buddyTree.Nodes.Add(tempNode);
+                            groupNode = tempNode;
+                        }
+                        else
+                        {
+                            groupNode = rb[0];
+                        }
+
+                        TreeNode buddyNode = new TreeNode
+                        {
+                            Name = buddy.NormalizedName,
+                            Text = buddy.Name,
+                            Tag = buddy
+                        };
+
+                        groupNode.Nodes.Add(buddyNode);
+                        updateBuddyNode(buddy, buddyNode);
+                    }
                 }
                 else
                 {
-                    log.DebugFormat("No buddyTree action taken for `{0}`", buddy.NormalizedName);
+                    log.InfoFormat("No buddyTree action taken for `{0}`", buddy.NormalizedName);
                 }
             }
             else
@@ -162,14 +185,14 @@ namespace WindotTOC
                 {
                     if (_IMForms.ContainsKey(im.From.Name))
                     {
-                        log.DebugFormat("Message window from `{0}` exists", im.From.Name);
+                        log.InfoFormat("Message window from `{0}` exists", im.From.Name);
 
                         IMForm imf = _IMForms[im.From.Name];
                         imf.NewIMMessage(im);
                     }
                     else
                     {
-                        log.DebugFormat("Creating message window from `{0}`", im.From.Name);
+                        log.InfoFormat("Creating message window from `{0}`", im.From.Name);
 
                         IMForm imf = new IMForm(_toc);
                         imf.FormClosed += new FormClosedEventHandler(OnIMFormClosed);
@@ -200,7 +223,7 @@ namespace WindotTOC
 
             if (frm != null)
             {
-                log.DebugFormat("Closing IMForm for `{0}`", frm.Username);
+                log.InfoFormat("Closing IMForm for `{0}`", frm.Username);
                 _IMForms.Remove(frm.Username);
             }
         }
