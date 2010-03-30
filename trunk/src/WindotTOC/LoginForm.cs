@@ -115,6 +115,10 @@ namespace WindotTOC
                     log.Error("Could not connect", ex);
                 }
             }
+            else
+            {
+                log.Info("Login clicked without username or pw");
+            }
         }
 
         private delegate void FormClosedHandler(object sender, FormClosedEventArgs e);
