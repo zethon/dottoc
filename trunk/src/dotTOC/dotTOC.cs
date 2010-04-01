@@ -113,12 +113,15 @@ namespace dotTOC
 
 		public delegate void OnChatJoinedHandler(string strRoomID, string strRoomName);
 		public event OnChatJoinedHandler OnChatJoined;
+
         #endregion
 
 		// privates
 		private bool _bDCOnPurpose = false;
-		private Byte[] m_byBuff = new Byte[32767];
-		private int _iSeqNum;
+
+		private Byte[] m_byBuff = new Byte[65535];
+		
+        private int _iSeqNum;
 
         #region back-end and login functions
         /// <summary>
@@ -226,12 +229,6 @@ namespace dotTOC
 			return retVal;
 		}
 
-		private void SetupRecieveCallback(Socket sock)
-		{
-		    AsyncCallback recieveData = new AsyncCallback(OnRecievedData);
-		    sock.BeginReceive(m_byBuff,0,m_byBuff.Length,SocketFlags.None,recieveData,sock);
-        }
-
         private void OnConnect(IAsyncResult ar)
         {
             Socket sock = (Socket)ar.AsyncState;
@@ -258,6 +255,12 @@ namespace dotTOC
                 //       * what kind, if any, should?
                 //DispatchError(ex.Message);
             }
+        }
+
+        private void SetupRecieveCallback(Socket sock)
+        {
+            AsyncCallback recieveData = new AsyncCallback(OnRecievedData);
+            sock.BeginReceive(m_byBuff, 0, m_byBuff.Length, SocketFlags.None, recieveData, sock);
         }
 
         private void OnRecievedData(IAsyncResult ar)
@@ -291,6 +294,18 @@ namespace dotTOC
                                 string sRecieved = Encoding.ASCII.GetString(m_byBuff, nBytesRead + 6, fh.datalen);
                                 Dispatch(sRecieved);
                                 break;
+
+                            case (FLAPTYPE.FT_ERROR):
+
+                            break;
+
+                            case (FLAPTYPE.FT_SIGNOFF):
+
+                            break;
+                                
+                            case (FLAPTYPE.FT_KEEPALIVE):
+
+                            break;
 
                             default:
                                 break;
