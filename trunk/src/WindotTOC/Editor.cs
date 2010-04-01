@@ -42,11 +42,11 @@ namespace Design
         public Editor()
         {
             InitializeComponent();
-            SetupEvents();
-            SetupTimer();
+            //SetupEvents();
+            //SetupTimer();
             SetupBrowser();
-            SetupFontComboBox();
-            SetupFontSizeComboBox();
+            //SetupFontComboBox();
+            //SetupFontSizeComboBox();
         }
 
         /// <summary>
