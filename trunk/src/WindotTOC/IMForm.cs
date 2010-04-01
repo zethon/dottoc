@@ -60,9 +60,9 @@ namespace WindotTOC
                 {
                     editor1.BodyHtml += string.Format("<font color=\"#CC0000\">({0}) <b>{1}</b></font>: {2}<br/>", 
                         DateTime.Now.ToShortTimeString(), im.From.Name, im.RawMessage);
-                }
 
-                editor1.Document.Window.ScrollTo(0, editor1.Document.Body.ScrollRectangle.Height);
+                    editor1.Document.Window.ScrollTo(0, editor1.Document.Body.ScrollRectangle.Height);
+                }
             }
             else
             {
@@ -87,9 +87,9 @@ namespace WindotTOC
                 {
                     editor1.BodyHtml += string.Format("<font color=\"#204A9D\">({0}) <b>{1}</b></font>: {2}<br/>", 
                         DateTime.Now.ToShortTimeString(), _toc.User.DisplayName, textBox1.Text);
-                }
 
-                editor1.Document.Window.ScrollTo(0, editor1.Document.Body.ScrollRectangle.Height);
+                    editor1.Document.Window.ScrollTo(0, editor1.Document.Body.ScrollRectangle.Height);
+                }
 
                 // reset the input box
                 textBox1.Text = string.Empty;

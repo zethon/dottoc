@@ -22,6 +22,7 @@ namespace WindotTOC
         UserConfig _config;
         Dictionary<string, IMForm> _IMForms;
         TOC _toc = null;
+        FormatNameForm _fnd;
 
         public BuddyListForm(TOC tocObj)
         {
@@ -300,6 +301,12 @@ namespace WindotTOC
             node.ImageKey = node.SelectedImageKey = strNewImageKey;
             node.NodeFont = new Font(buddyTree.Font, fs);
             node.ForeColor = fc;
+        }
+
+        private void setNameFormatToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            _fnd = new FormatNameForm();
+            _fnd.Show();
         }
     }
 }

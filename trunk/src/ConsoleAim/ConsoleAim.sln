@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dotTOC", "..\dotTOC\dotTOC.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindotTOC", "..\WindotTOC\WindotTOC.csproj", "{045CA99F-9253-46F3-B6D5-03A7328DF305}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Setup1", "..\WindotTOC\Setup1\Setup1.vdproj", "{FDCAA937-263C-44E9-B10A-3C95BB38A64D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,6 +27,8 @@ Global
 		{045CA99F-9253-46F3-B6D5-03A7328DF305}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{045CA99F-9253-46F3-B6D5-03A7328DF305}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{045CA99F-9253-46F3-B6D5-03A7328DF305}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FDCAA937-263C-44E9-B10A-3C95BB38A64D}.Debug|Any CPU.ActiveCfg = Debug
+		{FDCAA937-263C-44E9-B10A-3C95BB38A64D}.Release|Any CPU.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
