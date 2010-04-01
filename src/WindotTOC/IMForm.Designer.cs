@@ -45,10 +45,11 @@
             // 
             this.textBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox1.Location = new System.Drawing.Point(9, 293);
+            this.textBox1.Location = new System.Drawing.Point(12, 361);
+            this.textBox1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(339, 41);
+            this.textBox1.Size = new System.Drawing.Size(451, 50);
             this.textBox1.TabIndex = 0;
             this.textBox1.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textBox1_KeyPress);
             // 
@@ -59,7 +60,8 @@
             this.optionsToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(360, 24);
+            this.menuStrip1.Padding = new System.Windows.Forms.Padding(8, 2, 0, 2);
+            this.menuStrip1.Size = new System.Drawing.Size(480, 28);
             this.menuStrip1.TabIndex = 1;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -69,19 +71,19 @@
             this.saveConversationToolStripMenuItem,
             this.clearScrollbackToolStripMenuItem});
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(37, 20);
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(44, 24);
             this.toolStripMenuItem1.Text = "&File";
             // 
             // saveConversationToolStripMenuItem
             // 
             this.saveConversationToolStripMenuItem.Name = "saveConversationToolStripMenuItem";
-            this.saveConversationToolStripMenuItem.Size = new System.Drawing.Size(171, 22);
+            this.saveConversationToolStripMenuItem.Size = new System.Drawing.Size(199, 24);
             this.saveConversationToolStripMenuItem.Text = "&Save Conversation";
             // 
             // clearScrollbackToolStripMenuItem
             // 
             this.clearScrollbackToolStripMenuItem.Name = "clearScrollbackToolStripMenuItem";
-            this.clearScrollbackToolStripMenuItem.Size = new System.Drawing.Size(171, 22);
+            this.clearScrollbackToolStripMenuItem.Size = new System.Drawing.Size(199, 24);
             this.clearScrollbackToolStripMenuItem.Text = "&Clear Scrollback";
             // 
             // optionsToolStripMenuItem
@@ -90,19 +92,19 @@
             this.enableLoggingToolStripMenuItem,
             this.showTimestampsToolStripMenuItem});
             this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
-            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
+            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(73, 24);
             this.optionsToolStripMenuItem.Text = "&Options";
             // 
             // enableLoggingToolStripMenuItem
             // 
             this.enableLoggingToolStripMenuItem.Name = "enableLoggingToolStripMenuItem";
-            this.enableLoggingToolStripMenuItem.Size = new System.Drawing.Size(171, 22);
+            this.enableLoggingToolStripMenuItem.Size = new System.Drawing.Size(198, 24);
             this.enableLoggingToolStripMenuItem.Text = "Enable Logging";
             // 
             // showTimestampsToolStripMenuItem
             // 
             this.showTimestampsToolStripMenuItem.Name = "showTimestampsToolStripMenuItem";
-            this.showTimestampsToolStripMenuItem.Size = new System.Drawing.Size(171, 22);
+            this.showTimestampsToolStripMenuItem.Size = new System.Drawing.Size(198, 24);
             this.showTimestampsToolStripMenuItem.Text = "Show Timestamps";
             // 
             // editor1
@@ -113,26 +115,30 @@
             this.editor1.BodyHtml = null;
             this.editor1.BodyText = null;
             this.editor1.DocumentText = resources.GetString("editor1.DocumentText");
-            this.editor1.EditorBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.editor1.EditorBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
             this.editor1.EditorForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
-            this.editor1.FontSize = Design.FontSize.Three;
-            this.editor1.Location = new System.Drawing.Point(12, 28);
+            this.editor1.FontName = null;
+            this.editor1.FontSize = Design.FontSize.NA;
+            this.editor1.Location = new System.Drawing.Point(16, 34);
+            this.editor1.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
             this.editor1.Name = "editor1";
-            this.editor1.ReadOnly = true;
-            this.editor1.Size = new System.Drawing.Size(336, 259);
+            this.editor1.ReadOnly = false;
+            this.editor1.Size = new System.Drawing.Size(448, 319);
             this.editor1.TabIndex = 3;
             // 
             // IMForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(360, 347);
+            this.ClientSize = new System.Drawing.Size(480, 427);
             this.Controls.Add(this.editor1);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
+            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Name = "IMForm";
             this.Text = "IMForm";
+            this.Load += new System.EventHandler(this.IMForm_Load);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);

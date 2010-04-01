@@ -28,9 +28,6 @@ namespace WindotTOC
         {
             InitializeComponent();
             _toc = toc;
-
-            this.Text = _strUsername;
-            editor1.ReadOnly = true;
         }
 
         public IMForm(TOC toc, string strToUser)
@@ -38,7 +35,10 @@ namespace WindotTOC
             InitializeComponent();
             _toc = toc;
             _strUsername = strToUser;
+        }
 
+        private void IMForm_Load(object sender, EventArgs e)
+        {
             this.Text = _strUsername;
             editor1.ReadOnly = true;
         }
@@ -51,7 +51,14 @@ namespace WindotTOC
                 _strUsername = im.From.Name;
                 this.Text = _strUsername;
 
-                editor1.DocumentText += string.Format("<b><font color=\"#CC0000\">{0}</font></b>: {1}<br/>", im.From.Name, im.RawMessage);
+                if (editor1.BodyText == string.Empty)
+                {
+                    editor1.DocumentText += string.Format("<html><body><b><font color=\"#CC0000\">{0}</font></b>: {1}<br/></body></html>", im.From.Name, im.RawMessage);
+                }
+                else
+                {
+                    editor1.BodyHtml += string.Format("<b><font color=\"#CC0000\">{0}</font></b>: {1}<br/>", im.From.Name, im.RawMessage);
+                }
 
                 // TODO: scroll the window
             }
@@ -69,7 +76,14 @@ namespace WindotTOC
                 _toc.SendIM(new InstantMessage { To = new Buddy { Name = _strUsername }, RawMessage = textBox1.Text });
 
                 // add message to text box
-                editor1.DocumentText += string.Format("<b><font color=\"#204A9D\">{0}</font></b>: {1}<br/>", _toc.User.DisplayName, textBox1.Text);
+                if (editor1.BodyText == string.Empty)
+                {
+                    editor1.DocumentText += string.Format("<html><body><b><font color=\"#204A9D\">{0}</font></b>: {1}<br/></body></html>", _toc.User.DisplayName, textBox1.Text);
+                }
+                else
+                {
+                    editor1.BodyHtml += string.Format("<b><font color=\"#204A9D\">{0}</font></b>: {1}<br/>", _toc.User.DisplayName, textBox1.Text);
+                }
 
                 // TODO: scroll the window
 
@@ -78,6 +92,12 @@ namespace WindotTOC
                 textBox1.SelectionStart = 0;
                 e.Handled = true;
             }
+            else if (e.KeyChar == (char)27)
+            {
+                this.Close();
+            }
         }
+
+
     }
 }
