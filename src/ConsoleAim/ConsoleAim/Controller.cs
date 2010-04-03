@@ -52,10 +52,10 @@ namespace ConsoleAim
         public bool Init()
         {
             _toc = new TOC();
-            _toc.OnSignedOn += new TOC.OnSignedOnHandler(OnSignedOn);
-            _toc.OnIMIn += new TOC.OnIMInHandler(OnIMIn);
-            _toc.OnUpdateBuddy += new TOC.OnUpdateBubbyHandler(OnUpdateBuddy);
-            _toc.OnSendIM += new TOC.OnSendIMHander(OnSendIM);
+            _toc.OnSignedOn += new TOCInMessageHandlers.OnSignedOnHandler(OnSignedOn);
+            _toc.OnIMIn += new TOCInMessageHandlers.OnIMInHandler(OnIMIn);
+            _toc.OnUpdateBuddy += new TOCInMessageHandlers.OnUpdateBubbyHandler(OnUpdateBuddy);
+            _toc.OnSendIM += new TOCOutMessageHandlers.OnSendIMHander(OnSendIM);
             _toc.OnTOCError += new TOC.OnTOCErrorHandler(OnTOCError);
 
             _commands = new Commands(this);

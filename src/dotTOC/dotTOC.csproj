@@ -97,6 +97,8 @@
     <Compile Include="dotTOC.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="FlapHeader.cs" />
+    <Compile Include="Handlers.cs" />
     <Compile Include="InstantMessage.cs" />
     <Compile Include="TOCError.cs" />
     <Compile Include="User.cs" />
