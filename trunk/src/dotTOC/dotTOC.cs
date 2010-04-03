@@ -28,16 +28,6 @@ namespace dotTOC
 	/// </summary>
 	public class TOC
 	{
-        /// <summary>
-        /// The first 6 bytes of every message sent from Client -> TOC and TOC -> Client
-        /// </summary>
-        struct flap_header
-        {
-            public char asterisk;
-            public FLAPTYPE flaptype;
-            public short datalen;
-        };
-
         private class TOCCallbackAttribute : System.Attribute
         {
             public string Callback = string.Empty;
@@ -78,8 +68,26 @@ namespace dotTOC
 		}
 
         #region delegates/callbacks
-        public delegate void OnConfigHandler(UserConfig config);
-        public event OnConfigHandler OnConfig;
+
+        // flap type events
+        public event FlapHandlers.OnFlapSignOnHandler OnFlapSignOn;
+        public event FlapHandlers.OnFlapDataHandler OnFlapData;
+        public event FlapHandlers.OnFlapKeepAliveHanlder OnFlapKeepAlive;
+        public event FlapHandlers.OnFlapUnknownHandler OnFlapUnknown;
+
+        // incoming events
+        public event IncomingHandlers.OnReceiveData OnReceiveData;
+        public event TOCInMessageHandlers.OnServerMessageHandler OnServerMessage;
+        public event TOCInMessageHandlers.OnSignedOnHandler OnSignedOn;
+        public event TOCInMessageHandlers.OnIMInHandler OnIMIn;
+        public event TOCInMessageHandlers.OnEviledHandler OnEviled;
+        public event TOCInMessageHandlers.OnUpdateBubbyHandler OnUpdateBuddy;
+        public event TOCInMessageHandlers.OnChatJoinedHandler OnChatJoined;
+        public event TOCInMessageHandlers.OnConfigHandler OnConfig;
+
+        // outgoing events
+        public event TOCOutMessageHandlers.OnSendIMHander OnSendIM;
+        public event TOCOutMessageHandlers.OnSendServerMessageHandler OnSendServerMessage;
 
         public delegate void OnTOCErrorHandler(TOCError error);
         public event OnTOCErrorHandler OnTOCError;
@@ -90,38 +98,12 @@ namespace dotTOC
         public delegate void OnDoDisconnectHandler();
         public event OnDoDisconnectHandler OnDoDisconnect;
 
-		public delegate void OnSignedOnHandler();
-		public event OnSignedOnHandler OnSignedOn;
-
-		public delegate void OnIMInHandler(InstantMessage im);
-		public event OnIMInHandler OnIMIn;
-
-        public delegate void OnSendIMHander(InstantMessage im);
-        public event OnSendIMHander OnSendIM;
-
-		public delegate void OnUpdateBubbyHandler(Buddy buddy);
-		public event OnUpdateBubbyHandler OnUpdateBuddy;
-
-		public delegate void OnEviledHandler(int iLvl, bool bAnonymous, string strSender);
-		public event OnEviledHandler OnEviled;
-
-		public delegate void OnServerMessageHandler(string strIncoming);
-		public event OnServerMessageHandler OnServerMessage;
-
-        public delegate void OnSendServerMessageHandler(string Outgoing);
-        public event OnSendServerMessageHandler OnSendServerMessage;
-
-		public delegate void OnChatJoinedHandler(string strRoomID, string strRoomName);
-		public event OnChatJoinedHandler OnChatJoined;
-
         #endregion
 
 		// privates
 		private bool _bDCOnPurpose = false;
-
-		private Byte[] m_byBuff = new Byte[65535];
-		
-        private int _iSeqNum;
+		private Byte[] m_byBuff = new Byte[32767];
+		private int _iSeqNum;
 
         #region back-end and login functions
         /// <summary>
@@ -229,6 +211,12 @@ namespace dotTOC
 			return retVal;
 		}
 
+		private void SetupRecieveCallback(Socket sock)
+		{
+		    AsyncCallback recieveData = new AsyncCallback(OnRecievedData);
+		    sock.BeginReceive(m_byBuff,0,m_byBuff.Length,SocketFlags.None,recieveData,sock);
+        }
+
         private void OnConnect(IAsyncResult ar)
         {
             Socket sock = (Socket)ar.AsyncState;
@@ -257,18 +245,15 @@ namespace dotTOC
             }
         }
 
-        private void SetupRecieveCallback(Socket sock)
-        {
-            AsyncCallback recieveData = new AsyncCallback(OnRecievedData);
-            sock.BeginReceive(m_byBuff, 0, m_byBuff.Length, SocketFlags.None, recieveData, sock);
-        }
-
         private void OnRecievedData(IAsyncResult ar)
         {
             Socket sock = (Socket)ar.AsyncState;
-
+            
             try
             {
+                if (OnReceiveData != null)
+                    OnReceiveData(ar);
+
                 int nBytesRead = 0;
                 int nBytesRec = sock.EndReceive(ar);
 
@@ -276,42 +261,44 @@ namespace dotTOC
                 {
                     do
                     {
-                        flap_header fh = new flap_header();
-                        fh.asterisk = (char)m_byBuff[nBytesRead + 0];
-                        fh.flaptype = (FLAPTYPE)Enum.ToObject(typeof(FLAPTYPE), (byte)m_byBuff[nBytesRead + 1]);
+                        FlapHeader flap = new FlapHeader(nBytesRead,m_byBuff);
 
-                        byte[] byteTemp = { m_byBuff[nBytesRead + 5], m_byBuff[nBytesRead + 4] };
-                        fh.datalen = BitConverter.ToInt16(byteTemp, 0);
-
-                        switch (fh.flaptype)
+                        switch (flap.FlapType)
                         {
                             case (FLAPTYPE.FT_SIGNON):
+                                if (OnFlapSignOn != null)
+                                {
+                                    OnFlapSignOn(flap,m_byBuff);
+                                }
                                 SendFlapSignOn();
                                 SendUserSignOn();
-                                break;
+                             break;
 
                             case (FLAPTYPE.FT_DATA):
-                                string sRecieved = Encoding.ASCII.GetString(m_byBuff, nBytesRead + 6, fh.datalen);
+                                if (OnFlapData != null)
+                                {
+                                    OnFlapData(flap, m_byBuff);
+                                }
+                                string sRecieved = Encoding.ASCII.GetString(m_byBuff, nBytesRead + 6, flap.DataLength);
                                 Dispatch(sRecieved);
-                                break;
-
-                            case (FLAPTYPE.FT_ERROR):
-
                             break;
 
-                            case (FLAPTYPE.FT_SIGNOFF):
-
-                            break;
-                                
                             case (FLAPTYPE.FT_KEEPALIVE):
-
+                                if (OnFlapKeepAlive != null)
+                                {
+                                    OnFlapKeepAlive(flap, m_byBuff);
+                                }
                             break;
 
                             default:
-                                break;
+                                if (OnFlapUnknown != null)
+                                {
+                                    OnFlapUnknown(flap, m_byBuff);
+                                }
+                            break;
                         }
 
-                        nBytesRead += fh.datalen + 6;
+                        nBytesRead += flap.DataLength + 6;
 
                     } while (nBytesRead < nBytesRec);
 
