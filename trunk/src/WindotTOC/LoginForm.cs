@@ -25,14 +25,26 @@ namespace WindotTOC
         {
             InitializeComponent();
 
-            _toc.OnSignedOn += new TOC.OnSignedOnHandler(_toc_OnSignedOn);
+            _toc.OnSignedOn += new TOCInMessageHandlers.OnSignedOnHandler(_toc_OnSignedOn);
             _toc.OnTOCError += new TOC.OnTOCErrorHandler(_toc_OnTOCError);
-            _toc.OnConfig += new TOC.OnConfigHandler(_toc_OnConfig);
+            _toc.OnConfig += new TOCInMessageHandlers.OnConfigHandler(_toc_OnConfig);
 
-            _toc.OnServerMessage += new TOC.OnServerMessageHandler(_toc_OnServerMessage);
-            _toc.OnSendServerMessage += new TOC.OnSendServerMessageHandler(_toc_OnSendServerMessage);
+            _toc.OnServerMessage += new TOCInMessageHandlers.OnServerMessageHandler(_toc_OnServerMessage);
+            _toc.OnSendServerMessage += new TOCOutMessageHandlers.OnSendServerMessageHandler(_toc_OnSendServerMessage);
+
+            _toc.OnFlapUnknown += new FlapHandlers.OnFlapUnknownHandler(_toc_OnFlapUnknown);
 
             log.Info("LoginForm created");
+        }
+
+        void _toc_OnFlapUnknown(FlapHeader fh, byte[] buffer)
+        {
+            // Log Unknown Flap Types
+            log.WarnFormat("Unknown FlapType `{0}` DataLength={1}", fh.FlapType, fh.DataLength);
+            log.Warn(buffer.Take(fh.DataLength));
+
+            string temp = System.Text.ASCIIEncoding.ASCII.GetString(buffer);
+            log.Warn(temp);
         }
 
         private void LoginForm_Load(object sender, EventArgs e)

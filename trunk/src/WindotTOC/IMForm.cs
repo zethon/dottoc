@@ -39,6 +39,7 @@ namespace WindotTOC
 
         private void IMForm_Load(object sender, EventArgs e)
         {
+            log.InfoFormat("Loading IMForm for `{0}`", _strUsername);
             this.Text = _strUsername;
             editor1.ReadOnly = true;
         }

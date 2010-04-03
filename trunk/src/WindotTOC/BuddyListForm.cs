@@ -30,8 +30,8 @@ namespace WindotTOC
             _IMForms = new Dictionary<string, IMForm>();
 
             _toc = tocObj;
-            _toc.OnIMIn += new TOC.OnIMInHandler(OnNewMessage);
-            _toc.OnUpdateBuddy += new TOC.OnUpdateBubbyHandler(OnUpdateBuddy);
+            _toc.OnIMIn += new TOCInMessageHandlers.OnIMInHandler(OnNewMessage);
+            _toc.OnUpdateBuddy += new TOCInMessageHandlers.OnUpdateBubbyHandler(OnUpdateBuddy);
         }
 
         private delegate void UpdateBuddyHandler(Buddy buddy);
