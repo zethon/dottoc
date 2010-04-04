@@ -30,10 +30,17 @@ namespace WindotTOC
             _IMForms = new Dictionary<string, IMForm>();
 
             _toc = tocObj;
-            _toc.OnIMIn += new TOCInMessageHandlers.OnIMInHandler(OnNewMessage);
-            _toc.OnUpdateBuddy += new TOCInMessageHandlers.OnUpdateBubbyHandler(OnUpdateBuddy);
         }
 
+        private void BuddyListForm_Load(object sender, EventArgs e)
+        {
+            _toc.OnIMIn += new TOCInMessageHandlers.OnIMInHandler(OnNewMessage);
+            _toc.OnUpdateBuddy += new TOCInMessageHandlers.OnUpdateBubbyHandler(OnUpdateBuddy);
+
+            this.Text = _toc.User.DisplayName+"'s BuddyList";
+            log.InfoFormat("Loaded buddy list for `{0}`", _toc.User.DisplayName);
+        }
+        
         private delegate void UpdateBuddyHandler(Buddy buddy);
         private void OnUpdateBuddy(Buddy buddy)
         {
@@ -87,7 +94,7 @@ namespace WindotTOC
 
                             TreeNode[] groupNodes = buddyTree.Nodes.Find(strKey, false);
 
-                            //// see if a node for the group exists in the treeview
+                            // see if a node for the group exists in the treeview
                             TreeNode groupNode = null;
                             if (groupNodes.Count() == 0)
                             { // group node not found, add it to the treeview
@@ -308,5 +315,6 @@ namespace WindotTOC
             _fnd = new FormatNameForm();
             _fnd.Show();
         }
+
     }
 }
