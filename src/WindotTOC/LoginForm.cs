@@ -29,12 +29,23 @@ namespace WindotTOC
             _toc.OnTOCError += new TOC.OnTOCErrorHandler(_toc_OnTOCError);
             _toc.OnConfig += new TOCInMessageHandlers.OnConfigHandler(_toc_OnConfig);
 
-            _toc.OnServerMessage += new TOCInMessageHandlers.OnServerMessageHandler(_toc_OnServerMessage);
             _toc.OnSendServerMessage += new TOCOutMessageHandlers.OnSendServerMessageHandler(_toc_OnSendServerMessage);
+            _toc.OnFlapData += new FlapHandlers.OnFlapDataHandler(_toc_OnFlapData);
 
             _toc.OnFlapUnknown += new FlapHandlers.OnFlapUnknownHandler(_toc_OnFlapUnknown);
 
             log.Info("LoginForm created");
+        }
+
+        void _toc_OnSendServerMessage(string Outgoing)
+        {
+            log.DebugFormat("INMSG:{0}", Outgoing);
+        }
+
+        void _toc_OnFlapData(FlapHeader fh, byte[] buffer)
+        {
+            string strMessage = Encoding.ASCII.GetString(buffer, 6, fh.DataLength);
+            log.DebugFormat("OUTMSG({0}): {1}", fh.DataLength, strMessage);
         }
 
         void _toc_OnFlapUnknown(FlapHeader fh, byte[] buffer)
@@ -66,25 +77,23 @@ namespace WindotTOC
             }
         }
 
+        private delegate void FormClosingHandler(object sender, FormClosingEventArgs e);
         private void LoginForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (!Properties.Settings.Default.RememberUser)
+            if (InvokeRequired)
             {
-                usernameTxt.Text = string.Empty;
+                Invoke(new FormClosingHandler(LoginForm_FormClosing), new object[] { sender, e });
             }
+            else
+            {
+                if (!Properties.Settings.Default.RememberUser)
+                {
+                    usernameTxt.Text = string.Empty;
+                }
 
-            Properties.Settings.Default.Save();
-            log.Info("LoginForm closing and defaults saved");
-        }
-
-        void _toc_OnSendServerMessage(string Outgoing)
-        {
-            log.DebugFormat("<< {0}", Outgoing);
-        }
-
-        void _toc_OnServerMessage(string strIncoming)
-        {
-            log.DebugFormat(">> {0}", strIncoming);
+                Properties.Settings.Default.Save();
+                log.Info("LoginForm closing and defaults saved");
+            }
         }
 
         void _toc_OnConfig(UserConfig config)
