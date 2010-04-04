@@ -41,18 +41,9 @@ namespace dotTOC
 
         public string Server = "toc.oscar.aol.com";
         public int Port = 9898;
-
+        public readonly string ClientInfo = "dotTOC - .NET TOC Library";
         public Socket TOCSocket = null;
-        //public User CurrentUser;
-
-        private User _user;
-        public User User
-        {
-            get { return _user; }
-        }
-
-        public string ClientInfo = "dotTOC - .NET TOC Library";
-
+        
 		public bool Connected
 		{
             get
@@ -68,6 +59,13 @@ namespace dotTOC
             }
 		}
 
+        private User _user;
+        public User User
+        {
+            get { return _user; }
+        }
+
+
         #region delegates/callbacks
 
         // flap type events
@@ -77,7 +75,6 @@ namespace dotTOC
         public event FlapHandlers.OnFlapUnknownHandler OnFlapUnknown;
 
         // incoming events
-        public event IncomingHandlers.OnReceiveData OnReceiveData;
         public event TOCInMessageHandlers.OnServerMessageHandler OnServerMessage;
         public event TOCInMessageHandlers.OnSignedOnHandler OnSignedOn;
         public event TOCInMessageHandlers.OnIMInHandler OnIMIn;
@@ -103,11 +100,19 @@ namespace dotTOC
         #endregion
 
 		// privates
-		private bool _bDCOnPurpose = false;
-		
+
+        /// <summary>
+        /// Set to TRUE when Disconnect() is called
+        /// </summary>
+ 		private bool _bDCOnPurpose = false;
+
+        // socket buffer
         private Byte[] m_byBuff = new Byte[1024 * 32]; // 32k socket buffer
+
+        // current buffer offset
         private int _bufferOffset = 0;
 
+        // sequence number for outgoing toc packets
 		private int _iSeqNum;
 
         #region back-end and login functions
@@ -216,12 +221,72 @@ namespace dotTOC
 			return retVal;
 		}
 
-		private void SetupRecieveCallback(Socket sock)
-		{
-		    AsyncCallback recieveData = new AsyncCallback(OnRecievedData);
-            sock.BeginReceive(m_byBuff, _bufferOffset, m_byBuff.Length - _bufferOffset, SocketFlags.None, recieveData, sock);
+        /// <summary>
+        /// Parses and dispataches the incoming server message to the appropriate handlers.
+        /// </summary>
+        /// <param name="strIncoming">Raw version of the incoming server message.</param>
+        private void Dispatch(string strIncoming)
+        {
+            if (OnServerMessage != null)
+            {
+                OnServerMessage(strIncoming);
+            }
+
+            Regex r = new Regex("(:)"); // Split on colon
+            string[] strArray = r.Split(strIncoming);
+
+            foreach (MethodInfo mit in this.GetType().GetMethods())
+            {
+                foreach (object obj in mit.GetCustomAttributes(typeof(TOCCallbackAttribute), false))
+                {
+                    TOCCallbackAttribute callname = obj as TOCCallbackAttribute;
+                    if (callname != null && callname.Callback.ToLower() == strArray[0].ToLower())
+                    {
+                        if (mit.GetParameters() != null && mit.GetParameters().Length > 0)
+                        {
+                            mit.Invoke(this, new object[] { strArray });
+                        }
+                        else
+                        {
+                            mit.Invoke(this, null);
+                        }
+                    }
+                }
+            }
         }
 
+        #endregion private_functions
+
+		#region socket functions
+
+        public void Connect(string strName, string strPW)
+        {
+            _user = new User { Username = strName, DisplayName = strName, Password = strPW };
+            Connect();
+        }
+
+        public bool Connect()
+        {
+            if (_user.GetNormalizeName() != string.Empty)
+            {
+                if (TOCSocket != null && TOCSocket.Connected)
+                {
+                    Disconnect();
+                }
+
+                TOCSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                TOCSocket.Blocking = false;
+                TOCSocket.BeginConnect(Server, Port, new AsyncCallback(OnConnect), TOCSocket);
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Happens when the socket connection opens
+        /// </summary>
+        /// <param name="ar"></param>
         private void OnConnect(IAsyncResult ar)
         {
             Socket sock = (Socket)ar.AsyncState;
@@ -250,15 +315,22 @@ namespace dotTOC
             }
         }
 
+        private void SetupRecieveCallback(Socket sock)
+        {
+            AsyncCallback recieveData = new AsyncCallback(OnRecievedData);
+            sock.BeginReceive(m_byBuff, _bufferOffset, m_byBuff.Length - _bufferOffset, SocketFlags.None, recieveData, sock);
+        }
+
+        /// <summary>
+        /// Parser of the incoming data from TOC
+        /// </summary>
+        /// <param name="ar"></param>
         private void OnRecievedData(IAsyncResult ar)
         {
             Socket sock = (Socket)ar.AsyncState;
-            
+
             try
             {
-                if (OnReceiveData != null)
-                    OnReceiveData(ar);
-
                 int nBytesRead = 0;
                 int nBytesRec = sock.EndReceive(ar);
                 nBytesRec += _bufferOffset;
@@ -270,7 +342,7 @@ namespace dotTOC
                 {
                     FlapHeader flap = new FlapHeader(m_byBuff.Skip(nBytesRead).ToArray());
 
-                    if (((nBytesRec - nBytesRead)+_bufferOffset) < (flap.DataLength + 6))
+                    if (((nBytesRec - nBytesRead) + _bufferOffset) < (flap.DataLength + 6))
                     {
                         byte[] temp = m_byBuff.Skip(nBytesRead).Take(nBytesRec - nBytesRead).ToArray();
                         m_byBuff = new byte[32676];
@@ -325,7 +397,7 @@ namespace dotTOC
 
                 SetupRecieveCallback(sock);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 // the connection may have dropped
                 if (!sock.Connected && !_bDCOnPurpose)
@@ -341,67 +413,6 @@ namespace dotTOC
             }
         }
 
-        /// <summary>
-        /// Parses and dispataches the incoming server message to the appropriate handlers.
-        /// </summary>
-        /// <param name="strIncoming">Raw version of the incoming server message.</param>
-        private void Dispatch(string strIncoming)
-        {
-            if (OnServerMessage != null)
-            {
-                OnServerMessage(strIncoming);
-            }
-
-            Regex r = new Regex("(:)"); // Split on colon
-            string[] strArray = r.Split(strIncoming);
-
-            foreach (MethodInfo mit in this.GetType().GetMethods())
-            {
-                foreach (object obj in mit.GetCustomAttributes(typeof(TOCCallbackAttribute), false))
-                {
-                    TOCCallbackAttribute callname = obj as TOCCallbackAttribute;
-                    if (callname != null && callname.Callback.ToLower() == strArray[0].ToLower())
-                    {
-                        if (mit.GetParameters() != null && mit.GetParameters().Length > 0)
-                        {
-                            mit.Invoke(this, new object[] { strArray });
-                        }
-                        else
-                        {
-                            mit.Invoke(this, null);
-                        }
-                    }
-                }
-            }
-        }
-
-        #endregion private_functions
-
-		#region server functions
-
-        public void Connect(string strName, string strPW)
-        {
-            _user = new User { Username = strName, DisplayName = strName, Password = strPW };
-            Connect();
-        }
-
-        public bool Connect()
-        {
-            if (_user.GetNormalizeName() != string.Empty)
-            {
-                if (TOCSocket != null && TOCSocket.Connected)
-                {
-                    Disconnect();
-                }
-
-                TOCSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                TOCSocket.Blocking = false;
-                TOCSocket.BeginConnect(Server, Port, new AsyncCallback(OnConnect), TOCSocket);
-                return true;
-            }
-
-            return false;
-        }
 
         public void Disconnect()
         {
@@ -419,7 +430,9 @@ namespace dotTOC
                 }
             }
         }
+        #endregion
 
+        #region TOC Client Commands
         public static string Encode(string strMessage)
         {
             string strRetStr = "";
@@ -484,10 +497,6 @@ namespace dotTOC
                 }
             }
         }
-
-        #endregion 
-
-        #region TOC Client Commands
 
         /// <summary>
         /// Send an IM
