@@ -52,14 +52,14 @@
             this.buddyTree.HideSelection = false;
             this.buddyTree.ImageKey = "group";
             this.buddyTree.ImageList = this.imageList1;
-            this.buddyTree.Location = new System.Drawing.Point(5, 48);
+            this.buddyTree.Location = new System.Drawing.Point(5, 32);
             this.buddyTree.Margin = new System.Windows.Forms.Padding(4);
             this.buddyTree.Name = "buddyTree";
             this.buddyTree.SelectedImageKey = "group";
             this.buddyTree.ShowLines = false;
             this.buddyTree.ShowPlusMinus = false;
             this.buddyTree.ShowRootLines = false;
-            this.buddyTree.Size = new System.Drawing.Size(267, 419);
+            this.buddyTree.Size = new System.Drawing.Size(267, 435);
             this.buddyTree.TabIndex = 0;
             this.buddyTree.DoubleClick += new System.EventHandler(this.buddyTree_DoubleClick);
             // 
