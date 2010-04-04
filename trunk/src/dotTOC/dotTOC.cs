@@ -85,6 +85,7 @@ namespace dotTOC
         public event TOCInMessageHandlers.OnUpdateBubbyHandler OnUpdateBuddy;
         public event TOCInMessageHandlers.OnChatJoinedHandler OnChatJoined;
         public event TOCInMessageHandlers.OnConfigHandler OnConfig;
+        public event TOCInMessageHandlers.OnNickHandler OnNick;
 
         // outgoing events
         public event TOCOutMessageHandlers.OnSendIMHander OnSendIM;
@@ -674,6 +675,9 @@ namespace dotTOC
         public void DoNick(string[] Params)
         {
             User.DisplayName = Params[2];
+
+            if (OnNick != null)
+                OnNick(User.DisplayName);
         }
 
         [TOCCallback("SIGN_ON")]

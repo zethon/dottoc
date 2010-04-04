@@ -99,7 +99,7 @@ namespace dotTOC
 
             return new Buddy
             {
-                Name = User.Normalize(data[1]),
+                Name = data[1],
                 Online = (data[2] == @"T"),
                 EvilAmount = int.Parse(data[3]),
                 SignonTime = dt,

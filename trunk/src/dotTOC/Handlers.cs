@@ -33,6 +33,7 @@ namespace dotTOC
         public delegate void OnIMInHandler(InstantMessage im);
         public delegate void OnEviledHandler(int iLvl, bool bAnonymous, string strSender);
         public delegate void OnChatJoinedHandler(string strRoomID, string strRoomName);
+        public delegate void OnNickHandler(string strNick);
     }
 
     public class TOCOutMessageHandlers
