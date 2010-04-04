@@ -15,12 +15,12 @@ namespace dotTOC
         {
         }
 
-        public  FlapHeader(int iBytesRead, byte[] buffer)
+        public  FlapHeader(byte[] buffer)
         {
-            Asterik = (char)buffer[iBytesRead];
-            FlapType = (FLAPTYPE)Enum.ToObject(typeof(FLAPTYPE), (byte)buffer[iBytesRead + 1]);
+            Asterik = (char)buffer[0];
+            FlapType = (FLAPTYPE)Enum.ToObject(typeof(FLAPTYPE), (byte)buffer[1]);
 
-            byte[] byteTemp = { buffer[iBytesRead + 5], buffer[iBytesRead + 4] };
+            byte[] byteTemp = { buffer[5], buffer[4] };
             DataLength = BitConverter.ToInt16(byteTemp, 0);
         }
     }

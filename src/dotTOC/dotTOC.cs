@@ -9,6 +9,7 @@ using System.Net.Sockets;
 using System.Diagnostics;
 using System.Threading;
 using System.Collections.Generic;
+using System.Linq;
 using System.Timers;
 using System.Text.RegularExpressions;
 using System.Reflection;
@@ -102,7 +103,10 @@ namespace dotTOC
 
 		// privates
 		private bool _bDCOnPurpose = false;
-		private Byte[] m_byBuff = new Byte[32767];
+		
+        private Byte[] m_byBuff = new Byte[1024 * 32]; // 32k socket buffer
+        private int _bufferOffset = 0;
+
 		private int _iSeqNum;
 
         #region back-end and login functions
@@ -214,7 +218,7 @@ namespace dotTOC
 		private void SetupRecieveCallback(Socket sock)
 		{
 		    AsyncCallback recieveData = new AsyncCallback(OnRecievedData);
-		    sock.BeginReceive(m_byBuff,0,m_byBuff.Length,SocketFlags.None,recieveData,sock);
+            sock.BeginReceive(m_byBuff, _bufferOffset, m_byBuff.Length - _bufferOffset, SocketFlags.None, recieveData, sock);
         }
 
         private void OnConnect(IAsyncResult ar)
@@ -256,54 +260,69 @@ namespace dotTOC
 
                 int nBytesRead = 0;
                 int nBytesRec = sock.EndReceive(ar);
+                nBytesRec += _bufferOffset;
 
-                if (nBytesRec > 0)
+                if (nBytesRec == 0)
+                    return;
+
+                do
                 {
-                    do
-                    {
-                        FlapHeader flap = new FlapHeader(nBytesRead,m_byBuff);
+                    FlapHeader flap = new FlapHeader(m_byBuff.Skip(nBytesRead).ToArray());
 
+                    if (((nBytesRec - nBytesRead)+_bufferOffset) < (flap.DataLength + 6))
+                    {
+                        byte[] temp = m_byBuff.Skip(nBytesRead).Take(nBytesRec - nBytesRead).ToArray();
+                        m_byBuff = new byte[32676];
+                        Array.Copy(temp, m_byBuff, nBytesRec - nBytesRead);
+
+                        _bufferOffset = nBytesRec - nBytesRead;
+                        nBytesRead = nBytesRec + 1;
+                    }
+                    else
+                    {
                         switch (flap.FlapType)
                         {
                             case (FLAPTYPE.FT_SIGNON):
                                 if (OnFlapSignOn != null)
                                 {
-                                    OnFlapSignOn(flap,m_byBuff);
+                                    OnFlapSignOn(flap, m_byBuff.Skip(nBytesRead).Take(flap.DataLength + 6).ToArray());
                                 }
                                 SendFlapSignOn();
                                 SendUserSignOn();
-                             break;
+                                break;
 
                             case (FLAPTYPE.FT_DATA):
                                 if (OnFlapData != null)
                                 {
-                                    OnFlapData(flap, m_byBuff);
+                                    OnFlapData(flap, m_byBuff.Skip(nBytesRead).Take(flap.DataLength + 6).ToArray());
                                 }
+
                                 string sRecieved = Encoding.ASCII.GetString(m_byBuff, nBytesRead + 6, flap.DataLength);
                                 Dispatch(sRecieved);
-                            break;
+                                break;
 
                             case (FLAPTYPE.FT_KEEPALIVE):
                                 if (OnFlapKeepAlive != null)
                                 {
-                                    OnFlapKeepAlive(flap, m_byBuff);
+                                    OnFlapKeepAlive(flap, m_byBuff.Skip(nBytesRead).Take(flap.DataLength + 6).ToArray());
                                 }
-                            break;
+                                break;
 
                             default:
                                 if (OnFlapUnknown != null)
                                 {
-                                    OnFlapUnknown(flap, m_byBuff);
+                                    OnFlapUnknown(flap, m_byBuff.Skip(nBytesRead).Take(flap.DataLength + 6).ToArray());
                                 }
-                            break;
+                                break;
                         }
 
                         nBytesRead += flap.DataLength + 6;
+                        _bufferOffset = 0;
+                    }
 
-                    } while (nBytesRead < nBytesRec);
+                } while (nBytesRead < nBytesRec);
 
-                    SetupRecieveCallback(sock);
-                }
+                SetupRecieveCallback(sock);
             }
             catch(Exception ex)
             {
