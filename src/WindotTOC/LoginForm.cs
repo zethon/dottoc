@@ -70,7 +70,7 @@ namespace WindotTOC
             try
             {
                 FileVersionInfo info = FileVersionInfo.GetVersionInfo("WindotTOC.exe");
-                versionLabel.Text += " " + info.FileMajorPart + "." + info.FileMinorPart;
+                versionLabel.Text += " " + info.FileVersion;
 
                 linkLabel1.Links.Remove(linkLabel1.Links[0]);
                 linkLabel1.Links.Add(0, linkLabel1.Text.Length, @"http://code.google.com/p/dottoc/");

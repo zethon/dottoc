@@ -14,8 +14,8 @@ using System.Runtime.CompilerServices;
 [assembly: AssemblyDescription(".NET Libarary for AOL's TOC Protocol")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("")]
-[assembly: AssemblyCopyright("")]
+[assembly: AssemblyProduct("dotTOC")]
+[assembly: AssemblyCopyright("Copyright © 2009-2010 Adalid Claure")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]		
 
@@ -30,7 +30,7 @@ using System.Runtime.CompilerServices;
 // You can specify all the values or you can default the Revision and Build Numbers 
 // by using the '*' as shown below:
 
-[assembly: AssemblyVersion("0.2.0.128")]
+[assembly: AssemblyVersion("0.2.0.131")]
 
 //
 // In order to sign your assembly you must specify a key to use. Refer to the 

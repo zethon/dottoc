@@ -13,16 +13,6 @@ namespace dotTOC
         public delegate void OnFlapKeepAliveHanlder(FlapHeader fh, Byte[] buffer);
     }
 
-    public class OutgoingHandlers
-    {
-
-    }
-
-    public class IncomingHandlers
-    {
-        public delegate void OnReceiveData(IAsyncResult ar);
-    }
-
     public class TOCInMessageHandlers
     {
         public delegate void OnServerMessageHandler(string strIncoming);
