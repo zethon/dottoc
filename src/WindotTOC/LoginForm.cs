@@ -34,18 +34,25 @@ namespace WindotTOC
 
             _toc.OnFlapUnknown += new FlapHandlers.OnFlapUnknownHandler(_toc_OnFlapUnknown);
 
+            _toc.OnNick += new TOCInMessageHandlers.OnNickHandler(_toc_OnNick);
+
             log.Info("LoginForm created");
+        }
+
+        void _toc_OnNick(string strNick)
+        {
+            _blf.Text = _toc.User.DisplayName + "'s BuddyList";
         }
 
         void _toc_OnSendServerMessage(string Outgoing)
         {
-            log.DebugFormat("INMSG:{0}", Outgoing);
+            log.DebugFormat("OUTMSG:{0}", Outgoing);
         }
 
         void _toc_OnFlapData(FlapHeader fh, byte[] buffer)
         {
             string strMessage = Encoding.ASCII.GetString(buffer, 6, fh.DataLength);
-            log.DebugFormat("OUTMSG({0}): {1}", fh.DataLength, strMessage);
+            log.DebugFormat("INMSG({0}): {1}", fh.DataLength, strMessage);
         }
 
         void _toc_OnFlapUnknown(FlapHeader fh, byte[] buffer)
