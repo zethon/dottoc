@@ -99,6 +99,12 @@ namespace WindotTOC
             }
         }
 
+         private void clearScrollbackToolStripMenuItem_Click(object sender, EventArgs e)
+         {
+             editor1.BodyHtml = string.Empty;
+             editor1.Document.Window.ScrollTo(0, 0);
+         }
+
 
     }
 }
