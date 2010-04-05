@@ -75,18 +75,19 @@ namespace dotTOC
         public event FlapHandlers.OnFlapUnknownHandler OnFlapUnknown;
 
         // incoming events
-        public event TOCInMessageHandlers.OnServerMessageHandler OnServerMessage;
-        public event TOCInMessageHandlers.OnSignedOnHandler OnSignedOn;
-        public event TOCInMessageHandlers.OnIMInHandler OnIMIn;
-        public event TOCInMessageHandlers.OnEviledHandler OnEviled;
-        public event TOCInMessageHandlers.OnUpdateBubbyHandler OnUpdateBuddy;
-        public event TOCInMessageHandlers.OnChatJoinedHandler OnChatJoined;
-        public event TOCInMessageHandlers.OnConfigHandler OnConfig;
-        public event TOCInMessageHandlers.OnNickHandler OnNick;
+        public event IncomingHandlers.OnServerMessageHandler OnServerMessage;
+        public event IncomingHandlers.OnSignedOnHandler OnSignedOn;
+        public event IncomingHandlers.OnIMInHandler OnIMIn;
+        public event IncomingHandlers.OnEviledHandler OnEviled;
+        public event IncomingHandlers.OnUpdateBubbyHandler OnUpdateBuddy;
+        public event IncomingHandlers.OnChatJoinedHandler OnChatJoined;
+        public event IncomingHandlers.OnConfigHandler OnConfig;
+        public event IncomingHandlers.OnNickHandler OnNick;
+        public event IncomingHandlers.OnAdminNickStatus OnAdminNickstatus;
 
         // outgoing events
-        public event TOCOutMessageHandlers.OnSendIMHander OnSendIM;
-        public event TOCOutMessageHandlers.OnSendServerMessageHandler OnSendServerMessage;
+        public event OutgoingHandlers.OnSendIMHander OnSendIM;
+        public event OutgoingHandlers.OnSendServerMessageHandler OnSendServerMessage;
 
         public delegate void OnTOCErrorHandler(TOCError error);
         public event OnTOCErrorHandler OnTOCError;
@@ -106,14 +107,25 @@ namespace dotTOC
         /// </summary>
  		private bool _bDCOnPurpose = false;
 
-        // socket buffer
+        /// <summary>
+        /// socket buffer
+        /// </summary>
         private Byte[] m_byBuff = new Byte[1024 * 32]; // 32k socket buffer
 
-        // current buffer offset
+        /// <summary>
+        /// current buffer offset
+        /// </summary>
         private int _bufferOffset = 0;
 
-        // sequence number for outgoing toc packets
+        /// <summary>
+        /// sequence number for outgoing toc packets
+        /// </summary>
 		private int _iSeqNum;
+
+        /// <summary>
+        /// Holds temporary nick name while client waits for ADMIN_NICK_STATUS confirmation
+        /// </summary>
+        private string _strTempNickName = string.Empty; 
 
         #region back-end and login functions
         /// <summary>
@@ -255,7 +267,7 @@ namespace dotTOC
             }
         }
 
-        #endregion private_functions
+        #endregion
 
 		#region socket functions
 
@@ -470,7 +482,10 @@ namespace dotTOC
         public void FormatNickname(string strFormat)
         {
             Send(string.Format("toc_format_nickname {0}", Encode(strFormat)));
+            _strTempNickName = strFormat;
         }
+
+
 
         /// <summary>
         /// Send a TOC command to the server
@@ -523,7 +538,7 @@ namespace dotTOC
         /// <summary>
         /// Sets user's away status as having returned
         /// </summary>
-        public void SetAway()
+        public void SetAvailable()
         {
             SetAway(string.Empty);
         }
@@ -559,9 +574,16 @@ namespace dotTOC
         [TOCCallback("ADMIN_NICK_STATUS")]
         public void DoAdminNickStatus(string[] Params)
         {
-            if (Params[2] == @"0")
+            bool bSuccess = Params[2] == @"0";
+
+            if (bSuccess)
             {
-                // TODO: inmplement delegate/event
+                User.DisplayName = _strTempNickName;
+            }
+
+            if (OnAdminNickstatus != null)
+            {
+                OnAdminNickstatus(Params[2] == @"0");
             }
         }
 

@@ -13,7 +13,7 @@ namespace dotTOC
         public delegate void OnFlapKeepAliveHanlder(FlapHeader fh, Byte[] buffer);
     }
 
-    public class TOCInMessageHandlers
+    public class IncomingHandlers
     {
         public delegate void OnServerMessageHandler(string strIncoming);
         public delegate void OnSignedOnHandler();
@@ -24,9 +24,11 @@ namespace dotTOC
         public delegate void OnEviledHandler(int iLvl, bool bAnonymous, string strSender);
         public delegate void OnChatJoinedHandler(string strRoomID, string strRoomName);
         public delegate void OnNickHandler(string strNick);
+
+        public delegate void OnAdminNickStatus(bool bSuccess);
     }
 
-    public class TOCOutMessageHandlers
+    public class OutgoingHandlers
     {
         public delegate void OnSendServerMessageHandler(string Outgoing);
         public delegate void OnSendIMHander(InstantMessage im);
