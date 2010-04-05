@@ -445,6 +445,7 @@ namespace dotTOC
         #endregion
 
         #region TOC Client Commands
+
         public static string Encode(string strMessage)
         {
             string strRetStr = "";
