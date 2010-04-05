@@ -73,7 +73,7 @@
         "PackageFilesAs" = "3:2"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
-        "Compression" = "3:3"
+        "Compression" = "3:2"
         "SignOutput" = "11:FALSE"
         "CertificateFile" = "8:"
         "PrivateKeyFile" = "8:"
@@ -123,6 +123,19 @@
             "PrerequisitesLocation" = "2:1"
             "Url" = "8:"
             "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:Microsoft.Net.Framework.3.5.SP1"
+                    {
+                    "Name" = "8:.NET Framework 3.5 SP1"
+                    "ProductCode" = "8:Microsoft.Net.Framework.3.5.SP1"
+                    }
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:Microsoft.Windows.Installer.3.1"
+                    {
+                    "Name" = "8:Windows Installer 3.1"
+                    "ProductCode" = "8:Microsoft.Windows.Installer.3.1"
+                    }
+                }
             }
         }
     }
@@ -188,7 +201,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:dotTOC, Version=0.2.0.128, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:dotTOC, Version=0.2.0.131, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_FC36C554754E4C6782D13FA79F04BAFB"
@@ -272,7 +285,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:WindotTOC"
         "ProductCode" = "8:{5DD0EAA8-32A1-4DFA-8FDB-2CE153F1CC44}"
-        "PackageCode" = "8:{A50CECC4-9EDC-4767-9B98-C578F595C24A}"
+        "PackageCode" = "8:{6C8FC51A-493D-4C04-99BA-14F05DAA56A2}"
         "UpgradeCode" = "8:{83DB3A1D-FC5C-4C93-B8D9-E5EF8B2D50E1}"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"
