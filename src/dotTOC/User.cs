@@ -68,5 +68,4 @@ namespace dotTOC
             return retStr;
         }
     }
-
 }
