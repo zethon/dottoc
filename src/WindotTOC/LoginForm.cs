@@ -25,23 +25,17 @@ namespace WindotTOC
         {
             InitializeComponent();
 
-            _toc.OnSignedOn += new TOCInMessageHandlers.OnSignedOnHandler(_toc_OnSignedOn);
+            _toc.OnSignedOn += new IncomingHandlers.OnSignedOnHandler(_toc_OnSignedOn);
             _toc.OnTOCError += new TOC.OnTOCErrorHandler(_toc_OnTOCError);
-            _toc.OnConfig += new TOCInMessageHandlers.OnConfigHandler(_toc_OnConfig);
+            _toc.OnConfig += new IncomingHandlers.OnConfigHandler(_toc_OnConfig);
 
-            _toc.OnSendServerMessage += new TOCOutMessageHandlers.OnSendServerMessageHandler(_toc_OnSendServerMessage);
+            _toc.OnSendServerMessage += new OutgoingHandlers.OnSendServerMessageHandler(_toc_OnSendServerMessage);
             _toc.OnFlapData += new FlapHandlers.OnFlapDataHandler(_toc_OnFlapData);
 
             _toc.OnFlapUnknown += new FlapHandlers.OnFlapUnknownHandler(_toc_OnFlapUnknown);
 
-            _toc.OnNick += new TOCInMessageHandlers.OnNickHandler(_toc_OnNick);
 
             log.Info("LoginForm created");
-        }
-
-        void _toc_OnNick(string strNick)
-        {
-            _blf.Text = _toc.User.DisplayName + "'s BuddyList";
         }
 
         void _toc_OnSendServerMessage(string Outgoing)
