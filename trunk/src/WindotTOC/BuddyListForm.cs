@@ -18,10 +18,17 @@ namespace WindotTOC
 
         public bool IsExiting = false;
 
+
+        TOC _toc = null;
+        public TOC TOC
+        {
+            get { return _toc; }
+        }
+
         // privates
         UserConfig _config;
         Dictionary<string, IMForm> _IMForms;
-        TOC _toc = null;
+        
         FormatNameForm _fnd;
 
         public BuddyListForm(TOC tocObj)
@@ -34,11 +41,53 @@ namespace WindotTOC
 
         private void BuddyListForm_Load(object sender, EventArgs e)
         {
-            _toc.OnIMIn += new TOCInMessageHandlers.OnIMInHandler(OnNewMessage);
-            _toc.OnUpdateBuddy += new TOCInMessageHandlers.OnUpdateBubbyHandler(OnUpdateBuddy);
+            _toc.OnIMIn += new IncomingHandlers.OnIMInHandler(OnNewMessage);
+            _toc.OnUpdateBuddy += new IncomingHandlers.OnUpdateBubbyHandler(OnUpdateBuddy);
+            _toc.OnAdminNickstatus += new IncomingHandlers.OnAdminNickStatus(_toc_OnAdminNickstatus);
+            _toc.OnNick += new IncomingHandlers.OnNickHandler(_toc_OnNick);
 
             this.Text = _toc.User.DisplayName+"'s BuddyList";
             log.InfoFormat("Loaded buddy list for `{0}`", _toc.User.DisplayName);
+        }
+
+        void _toc_OnNick(string strNick)
+        {
+            try
+            {
+                this.Invoke(new MethodInvoker( 
+                    delegate 
+                    { 
+                        this.Text = strNick + "'s BuddyList"; 
+                    } 
+                    ));
+            }
+            catch (Exception ex)
+            {
+                log.Error("Could not handle OnNick properly", ex);
+            }
+        }
+
+        void _toc_OnAdminNickstatus(bool bSuccess)
+        {
+            try
+            {
+                Invoke(new MethodInvoker(
+                    delegate
+                    {
+                        if (bSuccess)
+                        {
+                            this.Text = TOC.User.DisplayName;
+                        }
+
+                        MessageBox.Show(bSuccess ? "Succeeded" : "Failed", "Admin Nick Status");
+                        log.InfoFormat("Admin Nick Status returned {0}", bSuccess);
+                    }
+                ));
+            }
+            catch (Exception ex)
+            {
+                log.Error("Could not handle OnAdminNickStatus", ex);
+            }
         }
         
         private delegate void UpdateBuddyHandler(Buddy buddy);
@@ -171,17 +220,14 @@ namespace WindotTOC
             }
         }
 
-        private delegate void ProcessConfigHanlder(UserConfig config);
         public void ProcessConfig(UserConfig config)
         {
-            if (!InvokeRequired)
-            {
-                _config = config;
-            }
-            else
-            {
-                Invoke(new ProcessConfigHanlder(ProcessConfig), new object[] { config });
-            }
+            Invoke(new MethodInvoker(
+                delegate
+                {
+                    _config = config;
+                }
+            ));
         }
 
         private delegate void NewWindowHandler(InstantMessage im);
@@ -227,17 +273,25 @@ namespace WindotTOC
 
         void OnIMFormClosed(object sender, FormClosedEventArgs e)
         {
-            IMForm frm = sender as IMForm;
-
-            if (frm != null)
+            try
             {
-                log.InfoFormat("Closing IMForm for `{0}`", frm.Username);
-                _IMForms.Remove(frm.Username);
+                IMForm frm = sender as IMForm;
+
+                if (frm != null)
+                {
+                    log.InfoFormat("Closing IMForm for `{0}`", frm.Username);
+                    _IMForms.Remove(frm.Username);
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error("Could not close IMForm", ex);
             }
         }
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            log.Info("exitToolStripMenuItem_Click event");
             IsExiting = true;
             _toc.Disconnect();
             Application.Exit();
@@ -245,6 +299,7 @@ namespace WindotTOC
 
         private void logOffToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            log.Info("logOffToolStripMenuItem_Click event");
             _toc.Disconnect();
             this.Hide();
             this.Dispose();
@@ -312,8 +367,9 @@ namespace WindotTOC
 
         private void setNameFormatToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            log.Info("setNameFormatToolStripMenuItem_Click event");
             _fnd = new FormatNameForm();
-            _fnd.Show();
+            _fnd.Show(this);
         }
 
     }
