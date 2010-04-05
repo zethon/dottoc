@@ -96,7 +96,7 @@ namespace WindotTOC
             if (!InvokeRequired)
             {
                 // search the buddlist. 
-                var q = from n in buddyTree.Nodes.Find(buddy.Name, true)
+                var q = from n in buddyTree.Nodes.Find(buddy.NormalizedName, true)
                         where n.Tag is Buddy && n.Name == buddy.NormalizedName 
                         select n;
 
@@ -226,6 +226,10 @@ namespace WindotTOC
                 delegate
                 {
                     _config = config;
+
+                    log.InfoFormat("Config # of groups={0}", _config.BuddyList.Keys.Count);
+                    log.InfoFormat("Config # of denylist={0}", _config.DenyList.Count);
+                    log.InfoFormat("Config # of permitlist={0}", _config.PermitList.Count);
                 }
             ));
         }
