@@ -45,5 +45,26 @@ namespace WindotTOC
                 this.Close();
             }
         }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
+        private void FormatNameForm_Load(object sender, EventArgs e)
+        {
+            try
+            {
+                BuddyListForm blf = Owner as BuddyListForm;
+
+                textBox1.Text = blf.TOC.User.DisplayName;
+                textBox1.SelectAll();
+            }
+            catch (Exception ex)
+            {
+                log.Error("Could not load form", ex);
+            }
+        }
     }
 }
+   

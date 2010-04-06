@@ -18,7 +18,6 @@ namespace WindotTOC
 
         public bool IsExiting = false;
 
-
         TOC _toc = null;
         public TOC TOC
         {
@@ -37,29 +36,62 @@ namespace WindotTOC
             _IMForms = new Dictionary<string, IMForm>();
 
             _toc = tocObj;
+            log.Info("BuddyListForm created");
+        }
+
+        public void ProcessConfig(UserConfig config)
+        {
+            Invoke(new MethodInvoker(
+                delegate
+                {
+                    _config = config;
+
+                    log.InfoFormat("Config # of groups={0}", _config.BuddyList.Keys.Count);
+                    log.InfoFormat("Config # of denylist={0}", _config.DenyList.Count);
+                    log.InfoFormat("Config # of permitlist={0}", _config.PermitList.Count);
+                }
+            ));
         }
 
         private void BuddyListForm_Load(object sender, EventArgs e)
         {
             _toc.OnIMIn += new IncomingHandlers.OnIMInHandler(OnNewMessage);
             _toc.OnUpdateBuddy += new IncomingHandlers.OnUpdateBubbyHandler(OnUpdateBuddy);
-            _toc.OnAdminNickstatus += new IncomingHandlers.OnAdminNickStatus(_toc_OnAdminNickstatus);
-            _toc.OnNick += new IncomingHandlers.OnNickHandler(_toc_OnNick);
+            _toc.OnAdminNickstatus += new IncomingHandlers.OnAdminNickStatus(OnAdminNickstatus);
+            _toc.OnNick += new IncomingHandlers.OnNickHandler(OnNick);
 
             this.Text = _toc.User.DisplayName+"'s BuddyList";
             log.InfoFormat("Loaded buddy list for `{0}`", _toc.User.DisplayName);
         }
 
-        void _toc_OnNick(string strNick)
+        private void BuddyListForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            _toc.OnIMIn -= new IncomingHandlers.OnIMInHandler(OnNewMessage);
+            _toc.OnUpdateBuddy -= new IncomingHandlers.OnUpdateBubbyHandler(OnUpdateBuddy);
+            _toc.OnAdminNickstatus -= new IncomingHandlers.OnAdminNickStatus(OnAdminNickstatus);
+            _toc.OnNick -= new IncomingHandlers.OnNickHandler(OnNick);
+            log.Info("BuddyListForm_FormClosing event. Event delegates removed.");
+        }
+
+        void OnNick(string strNick)
         {
             try
             {
-                this.Invoke(new MethodInvoker( 
-                    delegate 
-                    { 
-                        this.Text = strNick + "'s BuddyList"; 
-                    } 
-                    ));
+                if (!InvokeRequired)
+                {
+                    this.Text = strNick + "'s BuddyList";
+                    log.Info("BuddyList.Text changed, Invoke NOT Required");
+                }
+                else
+                {
+                    this.Invoke(new MethodInvoker(
+                        delegate
+                        {
+                            this.Text = strNick + "'s BuddyList";
+                            log.Info("BuddyList.Text changed, Invoke Required");
+                        }
+                        ));
+                }
             }
             catch (Exception ex)
             {
@@ -67,7 +99,7 @@ namespace WindotTOC
             }
         }
 
-        void _toc_OnAdminNickstatus(bool bSuccess)
+        void OnAdminNickstatus(bool bSuccess)
         {
             try
             {
@@ -220,20 +252,6 @@ namespace WindotTOC
             }
         }
 
-        public void ProcessConfig(UserConfig config)
-        {
-            Invoke(new MethodInvoker(
-                delegate
-                {
-                    _config = config;
-
-                    log.InfoFormat("Config # of groups={0}", _config.BuddyList.Keys.Count);
-                    log.InfoFormat("Config # of denylist={0}", _config.DenyList.Count);
-                    log.InfoFormat("Config # of permitlist={0}", _config.PermitList.Count);
-                }
-            ));
-        }
-
         private delegate void NewWindowHandler(InstantMessage im);
         void OnNewMessage(InstantMessage im)
         {
@@ -305,7 +323,7 @@ namespace WindotTOC
         {
             log.Info("logOffToolStripMenuItem_Click event");
             _toc.Disconnect();
-            this.Hide();
+            this.Close();
             this.Dispose();
         }
         
@@ -375,6 +393,5 @@ namespace WindotTOC
             _fnd = new FormatNameForm();
             _fnd.Show(this);
         }
-
     }
 }
