@@ -39,11 +39,29 @@ namespace dotTOC
             }
         }
 
+        /// <summary>
+        /// Gets or sets the TOC server name
+        /// </summary>
         public string Server = "toc.oscar.aol.com";
+
+        /// <summary>
+        /// Gets or sets the TOC server port
+        /// </summary>
         public int Port = 9898;
+
+        /// <summary>
+        /// Gets the information for the client connecting to the TOC. This is used in the initialization string of TOC
+        /// </summary>
         public readonly string ClientInfo = "dotTOC - .NET TOC Library";
+
+        /// <summary>
+        /// Gets the Socket object of the TOC connection
+        /// </summary>
         public Socket TOCSocket = null;
         
+        /// <summary>
+        /// Gets whether or not the socket connection is connected
+        /// </summary>
 		public bool Connected
 		{
             get
@@ -60,6 +78,10 @@ namespace dotTOC
 		}
 
         private User _user;
+        
+        /// <summary>
+        /// Gets the current user signed onto TOC
+        /// </summary>
         public User User
         {
             get { return _user; }
@@ -92,15 +114,17 @@ namespace dotTOC
         public delegate void OnTOCErrorHandler(TOCError error);
         public event OnTOCErrorHandler OnTOCError;
 
-		public delegate void OnDisconnectHandler();
+		public delegate void OnDisconnectHandler(Exception ex);
+
+        /// <summary>
+        /// Event executes when the socket connection is closed.
+        /// </summary>
 		public event OnDisconnectHandler OnDisconnect;
 
         public delegate void OnDoDisconnectHandler();
         public event OnDoDisconnectHandler OnDoDisconnect;
 
         #endregion
-
-		// privates
 
         /// <summary>
         /// Set to TRUE when Disconnect() is called
@@ -419,7 +443,7 @@ namespace dotTOC
 
                     if (OnDisconnect != null)
                     {
-                        OnDisconnect();
+                        OnDisconnect(ex);
                     }
                 }
             }
