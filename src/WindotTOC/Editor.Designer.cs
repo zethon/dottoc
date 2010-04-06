@@ -195,10 +195,10 @@ namespace Design
             this.webBrowser1.AllowWebBrowserDrop = false;
             this.webBrowser1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.webBrowser1.Location = new System.Drawing.Point(0, 0);
-            this.webBrowser1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.webBrowser1.Margin = new System.Windows.Forms.Padding(4);
             this.webBrowser1.MinimumSize = new System.Drawing.Size(27, 25);
             this.webBrowser1.Name = "webBrowser1";
-            this.webBrowser1.Size = new System.Drawing.Size(836, 185);
+            this.webBrowser1.Size = new System.Drawing.Size(680, 228);
             this.webBrowser1.TabIndex = 2;
             // 
             // cutToolStripMenuItem
@@ -275,9 +275,9 @@ namespace Design
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.webBrowser1);
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "Editor";
-            this.Size = new System.Drawing.Size(836, 185);
+            this.Size = new System.Drawing.Size(680, 228);
             this.contextMenuStrip1.ResumeLayout(false);
             this.ResumeLayout(false);
 

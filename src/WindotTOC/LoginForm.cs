@@ -17,13 +17,16 @@ namespace WindotTOC
     {
         static ILog log = LogManager.GetLogger(typeof(LoginForm));
 
-        Thread t;
+        //Thread t;
         BuddyListForm _blf;
         TOC _toc = new TOC();
 
         public LoginForm()
         {
             InitializeComponent();
+
+            _toc.OnDisconnect += new TOC.OnDisconnectHandler(_toc_OnDisconnect);
+            _toc.OnDoDisconnect += new TOC.OnDoDisconnectHandler(_toc_OnDoDisconnect);
 
             _toc.OnSignedOn += new IncomingHandlers.OnSignedOnHandler(_toc_OnSignedOn);
             _toc.OnTOCError += new TOC.OnTOCErrorHandler(_toc_OnTOCError);
@@ -36,6 +39,16 @@ namespace WindotTOC
 
 
             log.Info("LoginForm created");
+        }
+
+        void _toc_OnDoDisconnect()
+        {
+            log.Info("Connection to TOC server closed by client");
+        }
+
+        void _toc_OnDisconnect(Exception ex)
+        {
+            log.Info("Connection to TOC server disconnected", ex);
         }
 
         void _toc_OnSendServerMessage(string Outgoing)
@@ -92,6 +105,11 @@ namespace WindotTOC
                     usernameTxt.Text = string.Empty;
                 }
 
+                if (!Properties.Settings.Default.SavePassword || usernameTxt.Text == string.Empty)
+                {
+                    passwordTxt.Text = string.Empty;   
+                }
+
                 Properties.Settings.Default.Save();
                 log.Info("LoginForm closing and defaults saved");
             }
@@ -132,20 +150,12 @@ namespace WindotTOC
 
         void _toc_OnSignedOn()
         {
-            log.Info("TOC Signed On");
-
-            HideForm();
-
-
-            t = new Thread(new ThreadStart(SignedOn));
-            t.SetApartmentState(ApartmentState.STA);
-            t.Start();
-            //t.Join();
-        }
-
-        private void SignedOn()
-        {
-            _blf.ShowDialog();
+            Invoke(new MethodInvoker(delegate
+                {
+                    log.Info("TOC Signed On");
+                    _blf.Show();
+                    this.Hide();
+                }));
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -175,55 +185,22 @@ namespace WindotTOC
             }
         }
 
-        private delegate void FormClosedHandler(object sender, FormClosedEventArgs e);
         void bl_FormClosed(object sender, FormClosedEventArgs e)
         {
-            if (InvokeRequired)
-            {
-                Invoke(new FormClosedHandler(bl_FormClosed), new object[] { sender, e });
-            }
-            else
-            {
-                if (!_blf.IsExiting)
+            Invoke(new MethodInvoker(delegate
                 {
-                    this.Show();
-                }
-            }
-        }
-
-        private delegate void HideFormCallback();
-        virtual public void HideForm()
-        {
-            try
-            {
-                if (this.InvokeRequired)
-                {
-                    HideFormCallback cb = new HideFormCallback(HideForm);
-                    this.Invoke(cb);
-                }
-                else
-                {
-                    lock (this)
+                    if (!_blf.IsExiting)
                     {
-                        this.Hide();
-                        Application.DoEvents();
+                        _blf = null;
+                        this.Show();
                     }
-                }
-            }
-            catch
-            {
-
-            }
+                }));
         }
-
-
 
         private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             ProcessStartInfo sInfo = new ProcessStartInfo(e.Link.LinkData.ToString());
             Process.Start(sInfo);
         }
-
-
     }
 }
