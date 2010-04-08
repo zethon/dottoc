@@ -128,6 +128,7 @@
             this.setUserInfoToolStripMenuItem.Name = "setUserInfoToolStripMenuItem";
             this.setUserInfoToolStripMenuItem.Size = new System.Drawing.Size(194, 24);
             this.setUserInfoToolStripMenuItem.Text = "Set &User Info";
+            this.setUserInfoToolStripMenuItem.Click += new System.EventHandler(this.setUserInfoToolStripMenuItem_Click);
             // 
             // setNameFormatToolStripMenuItem
             // 
