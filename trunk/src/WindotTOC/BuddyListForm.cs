@@ -127,14 +127,14 @@ namespace WindotTOC
         {
             if (!InvokeRequired)
             {
-                // search the buddlist. 
+                // search the buddylist for this buddy
                 var q = from n in buddyTree.Nodes.Find(buddy.NormalizedName, true)
                         where n.Tag is Buddy && n.Name == buddy.NormalizedName 
                         select n;
 
-                // the buddy exists on the treeview
                 if (q.Count() > 0)
-                {
+                { // the buddy exists on the treeview
+
                     log.InfoFormat("Buddy `{0}` exists in buddyTree", buddy.NormalizedName);
                     foreach (TreeNode currentNode in q)
                     {
@@ -145,100 +145,21 @@ namespace WindotTOC
                         }
                         else
                         {
-                            // TODO: update the buddy's display on the treeview
+                            // update the buddy's display on the treeview
                             log.InfoFormat("Updating Buddy `{0}`", buddy.NormalizedName);
                             updateBuddyNode(buddy, currentNode);
                         }
                     }
                 }
                 else if (buddy.Online)
-                { // buddy is not on list and is now online
+                { // buddy is not on treeview but is online
 
-                    bool bBuddyAdded = false;
                     log.InfoFormat("Buddy `{0}` is not in buddyTree but is Online", buddy.NormalizedName);
 
-                    // check the config to see if we have info about this buddy in the config
-                    foreach (string strKey in _config.BuddyList.Keys)
-                    {
-                        List<Buddy> bl = _config.BuddyList[strKey];
-
-                        var q1 = from b in bl
-                                 where b.NormalizedName == buddy.NormalizedName
-                                 select b;
-
-                        if (q1.Count() > 0)
-                        {
-                            log.InfoFormat("Buddy `{0}` exists in config in group `{1}`", buddy.NormalizedName, strKey);
-
-                            // buddy can't be in the same group more than once
-                            Buddy configBuddyObj = q1.Single() as Buddy;
-
-                            TreeNode[] groupNodes = buddyTree.Nodes.Find(strKey, false);
-
-                            // see if a node for the group exists in the treeview
-                            TreeNode groupNode = null;
-                            if (groupNodes.Count() == 0)
-                            { // group node not found, add it to the treeview
-
-                                TreeNode tempNode = new TreeNode
-                                {
-                                    Name = strKey,
-                                    Text = strKey,
-                                };
-
-                                buddyTree.Nodes.Add(tempNode);
-                                tempNode.Expand();
-
-                                groupNode = tempNode;
-                            }
-                            else
-                            {
-                                groupNode = groupNodes[0];
-                            }
-
-                            TreeNode newNode = new TreeNode
-                            {
-                                Name = buddy.NormalizedName,
-                                Text = buddy.Name,
-                                Tag = buddy,
-                            };
-
-                            // add the buddy to the treeview node
-                            groupNode.Nodes.Add(newNode);
-                            updateBuddyNode(buddy, newNode);
-
-                            bBuddyAdded = true;
-                            break;
-                        }
-                    }
-
-                    if (!bBuddyAdded)
+                    if (!AddBuddyToConfigNode(buddy))
                     {
                         log.InfoFormat("Buddy `{0}` not in config but online. Adding to Recent Buddies.)", buddy.NormalizedName);
-
-                        TreeNode[] rb = buddyTree.Nodes.Find(@"Recent Buddies", false);
-                        TreeNode groupNode = null;
-
-                        if (rb.Count() == 0)
-                        {
-                            TreeNode tempNode = new TreeNode { Name = @"Recent Buddies", Text = @"Recent Buddies" };
-                            buddyTree.Nodes.Add(tempNode);
-                            groupNode = tempNode;
-                        }
-                        else
-                        {
-                            groupNode = rb[0];
-                        }
-
-                        TreeNode buddyNode = new TreeNode
-                        {
-                            Name = buddy.NormalizedName,
-                            Text = buddy.Name,
-                            Tag = buddy
-                        };
-
-                        groupNode.Nodes.Add(buddyNode);
-                        updateBuddyNode(buddy, buddyNode);
+                        AddBuddyToDefaultGroup(buddy);
                     }
                 }
                 else
@@ -250,6 +171,92 @@ namespace WindotTOC
             {
                 Invoke(new UpdateBuddyHandler(OnUpdateBuddy), new object[] { buddy } );
             }
+        }
+
+        private bool AddBuddyToConfigNode(Buddy buddy)
+        {
+            bool bBuddyAdded = false;
+
+            // check the config to see if we have info about this buddy in the config
+            foreach (string strKey in _config.BuddyList.Keys)
+            {
+                List<Buddy> bl = _config.BuddyList[strKey];
+
+                var q1 = from b in bl
+                         where b.NormalizedName == buddy.NormalizedName
+                         select b;
+
+                if (q1.Count() > 0)
+                {
+                    log.InfoFormat("Buddy `{0}` exists in config in group `{1}`", buddy.NormalizedName, strKey);
+
+                    // buddy can't be in the same group more than once
+                    Buddy configBuddyObj = q1.Single() as Buddy;
+
+                    TreeNode[] groupNodes = buddyTree.Nodes.Find(strKey, false);
+
+                    // see if a node for the group exists in the treeview
+                    TreeNode groupNode = null;
+                    if (groupNodes.Count() == 0)
+                    { // group node not found, add it to the treeview
+
+                        TreeNode tempNode = new TreeNode
+                        {
+                            Name = strKey,
+                            Text = strKey,
+                        };
+
+                        buddyTree.Nodes.Add(tempNode);
+                        tempNode.Expand();
+
+                        groupNode = tempNode;
+                    }
+                    else
+                    {
+                        groupNode = groupNodes[0];
+                    }
+
+                    AddBuddyToTree(buddy, groupNode);
+
+                    bBuddyAdded = true;
+                    break;
+                }
+            }
+
+            return bBuddyAdded;
+        }
+
+        private void AddBuddyToDefaultGroup(Buddy buddy)
+        {
+            TreeNode[] rb = buddyTree.Nodes.Find(@"Recent Buddies", false);
+            TreeNode groupNode = null;
+
+            if (rb.Count() == 0)
+            {
+                TreeNode tempNode = new TreeNode { Name = @"Recent Buddies", Text = @"Recent Buddies" };
+                buddyTree.Nodes.Add(tempNode);
+                groupNode = tempNode;
+            }
+            else
+            {
+                groupNode = rb[0];
+            }
+
+            AddBuddyToTree(buddy, groupNode);
+        }
+
+        private void AddBuddyToTree(Buddy buddy, TreeNode groupNode)
+        {
+            TreeNode newNode = new TreeNode
+            {
+                Name = buddy.NormalizedName,
+                Text = buddy.Name,
+                Tag = buddy,
+            };
+
+            // add the buddy to the treeview node
+            groupNode.Nodes.Add(newNode);
+            updateBuddyNode(buddy, newNode);
         }
 
         private delegate void NewWindowHandler(InstantMessage im);
@@ -392,6 +399,11 @@ namespace WindotTOC
             log.Info("setNameFormatToolStripMenuItem_Click event");
             _fnd = new FormatNameForm();
             _fnd.Show(this);
+        }
+
+        private void setUserInfoToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
