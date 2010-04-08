@@ -9,12 +9,12 @@ close FILE;
 open FILE, '>AssemblyInfo.cs' or die $!; 
 foreach my $line (@lines)
 {
-	if ($line =~ /Version\(\"\d+\.\d+.\d+.(\d+)\"\)\]/)
+	if ($line =~ /Version\(\"\d+.\d+.(\d+)\"\)\]/)
 	{
 		my $ver = $1;
 		$ver++;
 
-		$line =~ s/Version\(\"(\d+)\.(\d+).(\d+).(\d+)\"\)\]/Version\(\"$1\.$2.$3.$ver\"\)\]/;
+		$line =~ s/Version\(\"(\d+).(\d+).(\d+)\"\)\]/Version\(\"$1\.$2.$ver\"\)\]/;
 	}
 	
 	print FILE $line;
