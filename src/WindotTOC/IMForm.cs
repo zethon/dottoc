@@ -54,12 +54,12 @@ namespace WindotTOC
 
                 if (editor1.BodyText == string.Empty)
                 {
-                    editor1.DocumentText += string.Format("<html><body><font color=\"#CC0000\">({0}) <b>{1}</b></font>: {2}<br/></body></html>", 
+                    editor1.DocumentText += string.Format("<html><body topmargin=\"0\"><font size=\"2\" face=\"Courier New\" color=\"#CC0000\">({0}) <b>{1}</b></font>: {2}<br/></body></html>", 
                         DateTime.Now.ToShortTimeString(), im.From.Name, im.RawMessage);
                 }
                 else
                 {
-                    editor1.BodyHtml += string.Format("<font color=\"#CC0000\">({0}) <b>{1}</b></font>: {2}<br/>", 
+                    editor1.BodyHtml += string.Format("<font size=\"2\" face=\"Courier New\" color=\"#CC0000\">({0}) <b>{1}</b></font>: {2}<br/>", 
                         DateTime.Now.ToShortTimeString(), im.From.Name, im.RawMessage);
 
                     editor1.Document.Window.ScrollTo(0, editor1.Document.Body.ScrollRectangle.Height);
@@ -81,12 +81,12 @@ namespace WindotTOC
                 // add message to text box
                 if (editor1.BodyText == string.Empty)
                 {
-                    editor1.DocumentText += string.Format("<html><body><font color=\"#204A9D\">({0}) <b>{1}</b></font>: {2}<br/></body></html>", 
+                    editor1.DocumentText += string.Format("<html><body topmargin=\"0\"><font size=\"2\" face=\"Courier New\" color=\"#204A9D\">({0}) <b>{1}</b></font>: {2}<br/></body></html>", 
                         DateTime.Now.ToShortTimeString(), _toc.User.DisplayName, textBox1.Text);
                 }
                 else
                 {
-                    editor1.BodyHtml += string.Format("<font color=\"#204A9D\">({0}) <b>{1}</b></font>: {2}<br/>", 
+                    editor1.BodyHtml += string.Format("<font size=\"2\" face=\"Courier New\" color=\"#204A9D\">({0}) <b>{1}</b></font>: {2}<br/>", 
                         DateTime.Now.ToShortTimeString(), _toc.User.DisplayName, textBox1.Text);
 
                     editor1.Document.Window.ScrollTo(0, editor1.Document.Body.ScrollRectangle.Height);
