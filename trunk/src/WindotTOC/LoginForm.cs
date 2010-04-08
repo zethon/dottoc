@@ -77,7 +77,10 @@ namespace WindotTOC
             try
             {
                 FileVersionInfo info = FileVersionInfo.GetVersionInfo("WindotTOC.exe");
-                versionLabel.Text += " " + info.FileVersion;
+                versionLabel.Text = "WindotTOC v" + info.FileVersion;
+
+                info = FileVersionInfo.GetVersionInfo("dottoc.dll");
+                label3.Text = "dotTOC v" + info.FileVersion;
 
                 linkLabel1.Links.Remove(linkLabel1.Links[0]);
                 linkLabel1.Links.Add(0, linkLabel1.Text.Length, @"http://code.google.com/p/dottoc/");
