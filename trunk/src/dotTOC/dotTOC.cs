@@ -327,7 +327,6 @@ namespace dotTOC
         {
             Socket sock = (Socket)ar.AsyncState;
 
-            // Check if we were sucessfull
             try
             {
                 if (sock.Connected)
@@ -338,16 +337,14 @@ namespace dotTOC
                 }
                 else
                 {
-                    // TODO: OnConnectErrorHandler?
-                    //DispatchError("Connection failed.");
+                    if (OnDisconnect != null)
+                        OnDisconnect(new Exception("Socket could not connect"));
                 }
             }
-            catch// (Exception ex)
+            catch (Exception ex)
             {
-                // TODO: rethink the try/catch handling
-                //       * should it be handled in this module
-                //       * what kind, if any, should?
-                //DispatchError(ex.Message);
+                if (OnDisconnect != null)
+                    OnDisconnect(new Exception("Socket could not connect",ex));
             }
         }
 
@@ -509,8 +506,6 @@ namespace dotTOC
             Send(string.Format("toc_format_nickname {0}", Encode(strFormat)));
             _strTempNickName = strFormat;
         }
-
-
 
         /// <summary>
         /// Send a TOC command to the server
