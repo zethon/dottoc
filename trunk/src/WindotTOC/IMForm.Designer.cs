@@ -45,11 +45,11 @@
             // 
             this.textBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox1.Location = new System.Drawing.Point(12, 325);
+            this.textBox1.Location = new System.Drawing.Point(12, 360);
             this.textBox1.Margin = new System.Windows.Forms.Padding(4);
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(383, 50);
+            this.textBox1.Size = new System.Drawing.Size(443, 50);
             this.textBox1.TabIndex = 0;
             this.textBox1.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textBox1_KeyPress);
             // 
@@ -61,7 +61,7 @@
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Padding = new System.Windows.Forms.Padding(8, 2, 0, 2);
-            this.menuStrip1.Size = new System.Drawing.Size(412, 28);
+            this.menuStrip1.Size = new System.Drawing.Size(472, 28);
             this.menuStrip1.TabIndex = 1;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -125,17 +125,18 @@
             this.editor1.Margin = new System.Windows.Forms.Padding(5);
             this.editor1.Name = "editor1";
             this.editor1.ReadOnly = true;
-            this.editor1.Size = new System.Drawing.Size(380, 283);
+            this.editor1.Size = new System.Drawing.Size(440, 318);
             this.editor1.TabIndex = 3;
             // 
             // IMForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(412, 391);
+            this.ClientSize = new System.Drawing.Size(472, 426);
             this.Controls.Add(this.editor1);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.menuStrip1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip1;
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "IMForm";
