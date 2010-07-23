@@ -541,19 +541,47 @@ namespace dotTOC
         /// <param name="bAuto">A flag indicating if this is an automatic message sent by the client</param>
 		public void SendIM(InstantMessage im)
 		{
-			string strText;
-			
-            strText = string.Format("toc2_send_im {0} \"{1}\"{2}",
-				im.To.NormalizedName.ToString(),Encode(im.Message),
-				im.Auto ? " auto" : "");
-			
-            Send(strText);
+            System.Threading.Thread sendThread = new Thread(new ParameterizedThreadStart(DoSendMessage));
+            sendThread.Start(im);
+        }
+
+        private void DoSendMessage(object o)
+        {
+            InstantMessage im = o as InstantMessage;
+
+            if (im != null)
+            {
+			    string strMessage = im.Message;
+                string strSub = string.Empty;
+                int iCur = 0;
+                int iLen = 896;
+                int iSleep = 1000;
+
+                while (iCur < strMessage.Length)
+                {
+                    if (iCur + iLen > strMessage.Length)
+                    {
+                        iLen = strMessage.Length - iCur;
+                    }
+
+                    strSub = strMessage.Substring(iCur, iLen);
+
+                    string strText = string.Format("toc2_send_im {0} \"{1}\"{2}",
+				    im.To.NormalizedName.ToString(),Encode(strSub),
+				    im.Auto ? " auto" : "");
+                    Send(strText);
+                    iCur += iLen; 
+
+                    Thread.Sleep(iSleep);
+                    iSleep += 250;
+                }
+            }
 
             if (OnSendIM != null)
             {
                 OnSendIM(im);
             }
-		}
+        }
 
         /// <summary>
         /// Sets user's away status as having returned
