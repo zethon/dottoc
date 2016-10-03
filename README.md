@@ -1,6 +1,4 @@
-# dottoc
-
-# Not maintained
+# dottoc (defunct)
 
 ## Introduction
 
